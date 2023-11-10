@@ -135,7 +135,7 @@ const Main = ({ searchParams }: MainPageProps) => {
     <div className="flex flex-col items-center justify-center">
       {/* Title */}
       <div className="bg-white px-12 py-4 mb-2 rounded">
-        <h1 class="bg-gradient-to-r from-[#28d87b] to-[#57af95] inline-block text-transparent bg-clip-text font-bold text-3xl">
+        <h1 class="bg-gradient-to-r from-[#28d87b] to-[#57af95] inline-block text-transparent bg-clip-text font-bold md:text-3xl text-xl">
           Reverse Image Search
         </h1>
       </div>

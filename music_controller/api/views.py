@@ -17,16 +17,41 @@ class RoomView(generics.CreateAPIView):
 class CreateRoomView(APIView):
     def post(self, request, format=None):
         try:
-            # Check if 'image' is in the uploaded files
-            if 'image' not in request.FILES:
-                raise ValueError("No 'image' file in the request")
 
-            # Get the uploaded image file name
-            uploaded_image_name = request.FILES['image'].name
+            # Check if 'query' and 'dataset' are in the uploaded files
+            if 'query' not in request.FILES or 'dataset[0]' not in request.FILES:
+                raise ValueError(
+                    "Both 'query' and 'dataset' files are required in the request")
 
-            # Include additional request information
+            # Get the uploaded query file name
+
+            # Get the uploaded dataset files
+            uploaded_query_name = request.FILES['query'].name
+
+            # Process the query file as needed
+            # For example, you can save the file to a specific directory
+            # Make sure the 'MEDIA_ROOT' and 'MEDIA_URL' settings are configured in your Django project
+            # Example:
+            # from django.core.files.storage import default_storage
+            # from django.core.files.base import ContentFile
+            # query_path = default_storage.save('path/to/save/' + uploaded_query_name, ContentFile(request.FILES['query'].read()))
+
+            # Process each uploaded dataset file as needed
+            processed_dataset_names = []
+            for i in range(len(request.FILES)-1):
+                # Here, you can process each dataset file as needed
+                # For example, you can save the file to a specific directory
+                # Make sure the 'MEDIA_ROOT' and 'MEDIA_URL' settings are configured in your Django project
+                # Example:
+                # from django.core.files.storage import default_storage
+                # from django.core.files.base import ContentFile
+                # dataset_path = default_storage.save('path/to/save/' + uploaded_dataset.name, ContentFile(uploaded_dataset.read()))
+                processed_dataset_names.append(request.FILES[f'dataset[{i}]'])
+
+            # Include additional request information in the response
             response_data = {
-                'uploaded_image_name': uploaded_image_name,
+                'uploaded_query_name': uploaded_query_name,
+                'processed_dataset_names': processed_dataset_names,
                 'method': request.method,
                 'headers': dict(request.headers),
                 # Add more fields as needed
