@@ -107,10 +107,6 @@ const IMAGE_RESULT = [
     url: "/sunflower.jpg",
     similiarityrate: 100,
   },
-  {
-    url: "/sunflower.jpg",
-    similiarityrate: 10,
-  },
 ];
 
 export default IMAGE_RESULT;

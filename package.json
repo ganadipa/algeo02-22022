@@ -1,12 +1,15 @@
 {
-  "name": "qna-app",
+  "name": "algeo02-22011",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start:next": "next dev",
+    "start:django": "python ./music_controller/manage.py runserver",
+    "both": "npm-run-all -p start:next start:django"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.25.4",
