@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, type MouseEventHandler, useState } from "react";
 
-const imgEndpoint = "https://localhost:8000/images/";
+const imgEndpoint = "http://localhost:8000/images/";
 
 const FileUpload = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -23,10 +23,18 @@ const FileUpload = () => {
       });
   };
 
-  const handleImgChange:
-    | React.ChangeEventHandler<HTMLInputElement>
-    | undefined = (e) => {
-    setSelectedImage(e.target.files ? e.target.files[0] : null);
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> | undefined = (
+    e
+  ) => {
+    if (!e.target.files) return;
+    const img = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener("load", () => {
+      console.log(reader.result);
+    });
+
+    reader.readAsDataURL(img);
   };
 
   return (
@@ -38,7 +46,7 @@ const FileUpload = () => {
         id="imageInput"
         accept="image/*"
         ref={fileInputRef}
-        onChange={handleImgChange}
+        onChange={handleChange}
       />
       <button onClick={createImage}>submit</button>
     </div>
