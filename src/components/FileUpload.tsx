@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState } from "react";
 
-const CBIREndpoint = "http://localhost:8000/api/create-room";
+const CBIREndpoint = "http://localhost:8000/api/upload-image/";
 
 type FileUploadType = {
   setSelectedImage: React.Dispatch<

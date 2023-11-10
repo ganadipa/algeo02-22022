@@ -23,3 +23,10 @@ class Room(models.Model):
     guest_can_pause = models.BooleanField(null=False, default=False)
     votes_to_skip = models.IntegerField(null=False, default=1)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class ImageModel(models.Model):
+    image = models.ImageField(upload_to='uploaded_images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"ImageModel {self.id}"

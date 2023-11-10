@@ -1,11 +1,12 @@
 from rest_framework import status
 from django.shortcuts import render
 from rest_framework import generics, status
-from .serializers import RoomSerializer, CreateRoomSerializer
-from .models import Room
+from .serializers import RoomSerializer, CreateRoomSerializer,ImageModelSerializer
+from .models import Room, ImageModel
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 # Create your views here.
 
 
@@ -56,3 +57,22 @@ class CreateRoomView(APIView):
 
         #     return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
         # return Response({'Bad Request': 'invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ImageUploadView(APIView):
+    def post(self, request, format=None):
+        try:
+            # Check if 'image' is in the uploaded files
+            if 'image' not in request.FILES:
+                raise ValueError("No 'image' file in the request")
+
+            # Save the uploaded image to the model
+            uploaded_image = ImageModel(image=request.FILES['image'])
+            uploaded_image.save()
+
+            # Serialize the model instance for the response
+            serializer = ImageModelSerializer(uploaded_image)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
