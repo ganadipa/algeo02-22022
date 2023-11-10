@@ -84,7 +84,7 @@ def cosineSimilarity(vector1 : list[float], vector2 : list[float]) -> float:
     vectorlength1 = 0
     vectorlength2 = 0
 
-    for i in range(1, 3):
+    for i in range(0, 3):
         dot_product += (vector1[i] * vector2[i])
         vectorlength1 += (vector1[i] * vector1[i])
         vectorlength2 += (vector2[i] * vector2[i])
