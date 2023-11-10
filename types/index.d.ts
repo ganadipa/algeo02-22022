@@ -11,6 +11,12 @@ export interface SidebarLink {
   route: string;
   label: string;
 }
+export type ProfileType = {
+  name: string;
+  nim: string;
+  description: string;
+  img: string;
+};
 
 export interface Job {
   id?: string;

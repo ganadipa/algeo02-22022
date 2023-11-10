@@ -40,7 +40,7 @@ export default function RootLayout({
           <LeftSidebar />
         </div>
         <div
-          className="
+          className="p-4
         "
         >
           {children}
