@@ -56,6 +56,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'music_controller.urls'
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+DATA_UPLOAD_MAX_NUMBER_FILES = 100000
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

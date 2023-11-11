@@ -55,7 +55,7 @@ const FileUpload = ({
         mode: "cors",
         body: formData,
       });
-
+      
       if (!response.ok) {
         // Handle non-successful responses (e.g., server error)
         throw new Error(`HTTP error! Status: ${response.status}`);
