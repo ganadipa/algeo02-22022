@@ -3,18 +3,36 @@ import React, { useRef, useState } from "react";
 
 const CBIREndpoint = "http://localhost:8000/api/upload-image/";
 
+export type searchResultType = {
+  data: responseType[];
+  duration: number;
+}
+
+type responseType = {
+  similiarityRate: number;
+  image: string;
+}
+
+type BackendResponseType= {
+  duration: number;
+  similiarity_arr: number[];
+  dataset: string[];
+}
+
 type FileUploadType = {
   setSelectedImage: React.Dispatch<
     React.SetStateAction<string | ArrayBuffer | null>
   >;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   selectedImage: string | ArrayBuffer | null;
+  setSearchResult: React.Dispatch<searchResultType>
 };
 
 const FileUpload = ({
   setSelectedImage,
   setLoading,
   selectedImage,
+  setSearchResult
 }: FileUploadType) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const datasetInputRef = useRef<HTMLInputElement | null>(null);
@@ -61,11 +79,25 @@ const FileUpload = ({
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data:BackendResponseType = await response.json();
       console.log(data);
+      
+      let searchResultFromData: searchResultType = {
+        data: [],
+        duration: 0
+      }
+
+      searchResultFromData.duration = data.duration;
+      for (let i =0; i< data.similiarity_arr.length; i++) {
+        searchResultFromData.data.push({
+          similiarityRate: data.similiarity_arr[i],
+          image: data.dataset[i]
+        })
+      }
 
       // Set datasetUploaded state based on the response
       setDatasetUploaded(true);
+      setSearchResult(searchResultFromData)
     } catch (error) {
       console.error("Error during fetch:", error);
     } finally {
