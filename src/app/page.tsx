@@ -1,15 +1,10 @@
-// @ts-nocheck
-/* eslint-disable */
-
 "use client";
 
 import FileUpload from "../components/FileUpload";
 import SkeletonLoading from "../components/LoadingSkeleton";
 import IMAGE_RESULT from "../../constant/Main";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 type PagingButtonHelperProps = {
   numpage: number;
@@ -36,7 +31,7 @@ const ShowGreaterThan3 = ({
     <>
       {numpage === 1 || (
         <div
-          className={`cursor-pointer border flex bg-white items-center justify-center h-6 w-6`}
+          className={`flex h-6 w-6 cursor-pointer items-center justify-center border bg-white`}
           onClick={() => setNumpage(1)}
         >
           <button className="" onClick={() => setNumpage(1)}>
@@ -47,31 +42,31 @@ const ShowGreaterThan3 = ({
       {showLeftDotDot && <p>...</p>}
       {intersectWithFirst || (
         <div
-          className={`border flex items-center justify-center bg-white h-6 w-6`}
+          className={`flex h-6 w-6 items-center justify-center border bg-white`}
           onClick={() => setNumpage(numpage - 1)}
         >
           <button className="">{numpage - 1}</button>
         </div>
       )}
       <div
-        className={`border flex items-center justify-center h-6 w-6 primary-gradient text-white font-semibold`}
+        className={`primary-gradient flex h-6 w-6 items-center justify-center border font-semibold text-white`}
         onClick={() => setNumpage(numpage)}
       >
         <button className="">{numpage}</button>
       </div>
       {intersectWithLast || (
         <div
-          className={`border flex items-center justify-center bg-white h-6 w-6`}
+          className={`flex h-6 w-6 items-center justify-center border bg-white`}
           onClick={() => setNumpage(numpage + 1)}
         >
           <button className="">{numpage + 1}</button>
         </div>
       )}
       {showRightDotDot && <p>...</p>}
-      {numpage == maxpage || (
+      {numpage === maxpage || (
         <div
           key={maxpage}
-          className={`border flex items-center justify-center bg-white h-6 w-6`}
+          className={`flex h-6 w-6 items-center justify-center border bg-white`}
           onClick={() => setNumpage(maxpage)}
         >
           <button className="">{maxpage}</button>
@@ -93,8 +88,8 @@ const ShowLessThan4 = ({
         return (
           <div
             key={num}
-            className={`border flex items-center justify-center border${
-              numpage == num ? "blue-300" : "red-400"
+            className={`flex items-center justify-center ${
+              numpage === num ? "border-blue-300" : "border-red-400"
             } h-6 w-6`}
           >
             <button className="" onClick={() => setNumpage(num)}>
@@ -110,39 +105,27 @@ const ShowLessThan4 = ({
 const Main = ({ searchParams }: MainPageProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [numpage, setNumpage] = useState<number>(1);
-  const [datasetUploaded, setDatasetUploaded] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(false);
-  const router = useRouter();
+  const [selectedImage, setSelectedImage] = useState<
+    string | ArrayBuffer | null
+  >(null);
 
   const idxMin = (numpage - 1) * 6;
   const idxMax = Math.min(IMAGE_RESULT.length, numpage * 6);
   const SHOWING_IMAGES = IMAGE_RESULT.slice(idxMin, idxMax);
   const maxpage = Math.ceil(IMAGE_RESULT.length / 6);
 
-  // temporary
-  const [secs, setSecs] = useState(0);
-  const [filename, setFilename] = useState("hello");
-  const [loadingImages, setLoadingImages] = useState([
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-  ]);
-
   return (
     <div className="flex flex-col items-center justify-center">
       {/* Title */}
-      <div className="bg-white px-12 py-4 mb-2 rounded">
-        <h1 class="bg-gradient-to-r from-[#28d87b] to-[#57af95] inline-block text-transparent bg-clip-text font-bold md:text-3xl text-xl">
+      <div className="mb-2 rounded bg-white px-12 py-4">
+        <h1 className="inline-block bg-gradient-to-r from-[#28d87b] to-[#57af95] bg-clip-text text-xl font-bold text-transparent md:text-3xl">
           Reverse Image Search
         </h1>
       </div>
 
       <main className="flex h-full flex-col">
-        <section className="flex w-full max-md:flex-col md:flex-row gap-16 items-center justify-center mb-4">
-          <div className="relative max-md:aspect-video max-md:w-[300px] md:w-[450px] aspect-video">
+        <section className="mb-4 flex w-full items-center justify-center gap-16 max-md:flex-col md:flex-row">
+          <div className="relative aspect-video max-md:aspect-video max-md:w-[300px] md:w-[450px]">
             {loading ? (
               <SkeletonLoading
                 className="h-full w-full animate-pulse"
@@ -150,7 +133,13 @@ const Main = ({ searchParams }: MainPageProps) => {
               />
             ) : (
               <Image
-                src={selectedImage}
+                src={
+                  selectedImage
+                    ? typeof selectedImage === "string"
+                      ? selectedImage
+                      : Buffer.from(selectedImage).toString()
+                    : "/sunflower.jpeg"
+                }
                 alt=""
                 fill
                 objectFit="cover"
@@ -162,6 +151,7 @@ const Main = ({ searchParams }: MainPageProps) => {
             <FileUpload
               setLoading={setLoading}
               setSelectedImage={setSelectedImage}
+              selectedImage={selectedImage}
             />
           </div>
         </section>
@@ -170,17 +160,17 @@ const Main = ({ searchParams }: MainPageProps) => {
         <hr className="rounded-full border-[1.5px] border-slate-500" />
         {/* search result */}
         <section className="flex w-full flex-col ">
-          <div className="flex flex-row justify-between mb-4">
-            <h4 className="text-green-400 font-semibold">Result</h4>
+          <div className="mb-4 flex flex-row justify-between">
+            <h4 className="font-semibold text-green-400">Result</h4>
             <p>{IMAGE_RESULT.length} Results in 0.57 seconds.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 max-md:h-[50vh] md:grid-cols-3 mb-4">
+          <div className="mb-4 grid grid-cols-2 gap-4 max-md:h-[50vh] md:grid-cols-3">
             {SHOWING_IMAGES.map((img, ind) => {
               return (
                 <div key={ind} className="relative aspect-video md:w-[33vh]">
                   <Image src={img.url} alt="" fill objectFit="cover" />
-                  <div className="primary-gradient rounded absolute left-0 top-0 text-white px-2 py-0.5">
+                  <div className="primary-gradient absolute left-0 top-0 rounded px-2 py-0.5 text-white">
                     <span className="">
                       {Math.round(img.similiarityrate)} %
                     </span>
@@ -191,9 +181,9 @@ const Main = ({ searchParams }: MainPageProps) => {
           </div>
 
           {/* Pagination button */}
-          <div className="flex flex-row justify-center gap-2 mb-4">
+          <div className="mb-4 flex flex-row justify-center gap-2">
             {/* Left arrow button */}
-            {numpage != 1 && (
+            {numpage !== 1 && (
               <button onClick={() => setNumpage((numpage) => numpage - 1)}>
                 &lt;
               </button>
@@ -215,7 +205,7 @@ const Main = ({ searchParams }: MainPageProps) => {
             )}
 
             {/* Right arrow button */}
-            {numpage != maxpage && (
+            {numpage !== maxpage && (
               <button onClick={() => setNumpage((np) => np + 1)}>&gt;</button>
             )}
           </div>
