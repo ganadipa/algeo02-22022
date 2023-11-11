@@ -279,14 +279,18 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
 ############################
     """ DEBUGGING """
 ############################
-    # print("Color data: ")
+    # print("Light colors data: ")
     # for i in range(0,16,1):
-    #     print(f"i = {i}: ", "{:.4f}".format(colors1[i]), "{:.4f}".format(colors2[i]))
+    #     print(f"i = {i}: ", "{:.4f}".format(color_vector1[i]), "{:.4f}".format(color_vector2[i]))
+
+    # print("Light colors data: ")
+    # for i in range(16,32,1):
+    #     print(f"i = {i}: ", "{:.4f}".format(color_vector1[i]), "{:.4f}".format(color_vector2[i]))
 
     # print()
     # print("Greyscale: ")
-    # for i in range(16,20,1):
-    #     print(f"i = {i}: ", "{:.4f}".format(colors1[i]), "{:.4f}".format(colors2[i]))
+    # for i in range(32,36,1):
+    #     print(f"i = {i}: ", "{:.4f}".format(color_vector1[i]), "{:.4f}".format(color_vector2[i]))
 
     # print()
 

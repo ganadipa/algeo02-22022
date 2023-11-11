@@ -201,23 +201,23 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
             if s < 0.15:                          # Increment frequency of that color by +1
                 GreyScaleColors1[idx] += 1 
                 if idx == 1 or idx == 2:
-                    GreyScaleColors1[idx-1] += 0.5
-                    GreyScaleColors1[idx+1] += 0.5
+                    GreyScaleColors1[idx-1] += 0.19628
+                    GreyScaleColors1[idx+1] += 0.19628
             else:
                 if v > 0.7:
                     LightColors1[idx] += 1 
-                    LightColors1[(idx - 1) % 16] += 0.5
-                    LightColors1[(idx + 1) % 16] += 0.5
+                    LightColors1[(idx - 1) % 16] += 0.499
+                    LightColors1[(idx + 1) % 16] += 0.499
                     DarkColors1[idx] += 0.5
-                    DarkColors1[(idx - 1) % 16] += 0.25
-                    DarkColors1[(idx + 1) % 16] += 0.25
+                    DarkColors1[(idx - 1) % 16] += 0.2499
+                    DarkColors1[(idx + 1) % 16] += 0.2499
                 else:
                     DarkColors1[idx] += 1
-                    DarkColors1[(idx - 1) % 16] += 0.5 
-                    DarkColors1[(idx + 1) % 16] += 0.5
+                    DarkColors1[(idx - 1) % 16] += 0.499
+                    DarkColors1[(idx + 1) % 16] += 0.499
                     LightColors1[idx] += 0.5
-                    LightColors1[(idx - 1) % 16] += 0.25 
-                    LightColors1[(idx + 1) % 16] += 0.25
+                    LightColors1[(idx - 1) % 16] += 0.2499
+                    LightColors1[(idx + 1) % 16] += 0.2499
 
     # Di sini kita "increment sorrounding colors by weight"
 
@@ -238,23 +238,23 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
             if s < 0.15:
                 GreyScaleColors2[idx] += 1
                 if idx == 1 or idx == 2:
-                    GreyScaleColors2[idx-1] += 0.5
-                    GreyScaleColors2[idx+1] += 0.5
+                    GreyScaleColors2[idx-1] += 0.19628
+                    GreyScaleColors2[idx+1] += 0.19628
             else:
                 if v > 0.7:
                     LightColors2[idx] += 1 
-                    LightColors2[(idx - 1) % 16] += 0.5 
-                    LightColors2[(idx + 1) % 16] += 0.5
+                    LightColors2[(idx - 1) % 16] += 0.499
+                    LightColors2[(idx + 1) % 16] += 0.499
                     DarkColors2[idx] += 0.5
-                    DarkColors2[(idx - 1) % 16] += 0.25
-                    DarkColors2[(idx + 1) % 16] += 0.25
+                    DarkColors2[(idx - 1) % 16] += 0.2499
+                    DarkColors2[(idx + 1) % 16] += 0.2499
                 else:
                     DarkColors2[idx] += 1
-                    DarkColors2[(idx - 1) % 16] += 0.5 
-                    DarkColors2[(idx + 1) % 16] += 0.5
+                    DarkColors2[(idx - 1) % 16] += 0.499
+                    DarkColors2[(idx + 1) % 16] += 0.499
                     LightColors2[idx] += 0.5
-                    LightColors2[(idx - 1) % 16] += 0.25 
-                    LightColors2[(idx + 1) % 16] += 0.25
+                    LightColors2[(idx - 1) % 16] += 0.2499 
+                    LightColors2[(idx + 1) % 16] += 0.2499
 
     # Create 36 feature vector
     color_vector1 = []

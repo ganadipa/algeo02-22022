@@ -113,8 +113,8 @@ def similarityTexture(img1 : Image, img2 : Image) -> float:
     CHEvector1 = [contrast1, homogeneity1, entropy1]
     CHEvector2 = [contrast2, homogeneity2, entropy2]
 
-    print(CHEvector1)
-    print(CHEvector2)
+    # print(CHEvector1)
+    # print(CHEvector2)
 
     # Cosine similarity the vectors
     result = cosineSimilarity(CHEvector1, CHEvector2)

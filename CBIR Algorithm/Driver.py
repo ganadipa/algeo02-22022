@@ -6,7 +6,7 @@ import time
 
 # main
 key = input("Test 2 images (L) or tes a directory and a query (R): ")
-parent = "C:\\Users\\Aldy\\Desktop\\archive\\dataset500img\\" # GANTI INI KE DIRECTORY FOLDER IMAGESET
+parent = "C:\\Users\\Aldy\\Desktop\\archive\\dataset50img\\" # GANTI INI KE DIRECTORY FOLDER IMAGESET
 filenames = loadFolder(parent)
 images = loadImages(filenames)
 
@@ -52,6 +52,14 @@ else:
 
     start = time.time()
 
+
+    # Whole img
+    x1,y1 = img1.size
+    x2,y2 = img2.size
+    # s = calculateBlockSimilarity(img1, img2, 0, 0, x1, y1, 0, 0, x2, y2)
+
+
+    # print("{:.2f}".format(100 * s), end = " "); print("%")
     print("{:.2f}".format(100 * similarityColor(img1, img2)), end = " "); print("%")
 
     end = time.time()

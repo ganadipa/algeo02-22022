@@ -195,6 +195,18 @@ class ImageUploadView(APIView):
             os.remove(existing_image_path)
             print(f"Existing query image deleted: {existing_image_path}")
 
+
+
+
+        """
+        Gua gk tau ini set nya gmn ntar ganti -Aldy
+        """
+        isTexture = False
+
+
+
+
+
         query_image = request.FILES.get('query')
         if query_image:
             query_image_path = os.path.join(
@@ -227,7 +239,8 @@ class ImageUploadView(APIView):
         print(f"Query image path: {query_image_path}")
         print(f"Dataset folder path: {dataset_folder_path}")
 
-        response = getSimiliarity(self.root+query_image_path)
+        response = getSimiliarity(self.root+query_image_path, isTexture) # MODE TEKSTUR/WARNA
+
         # similarities = self.image_similarity(query_image_path, dataset_folder_path)
         # print(f"Similarities: {similarities}")
         # end time and print

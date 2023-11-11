@@ -13,31 +13,34 @@ def getSimiliarity(query, isTexture):
     start = time.time()
     similarity_values = []
 
+    result_dataset_files = list() # ```revisi aldy -> bikin list baru buat result files nya
     for i in range(len(dataset_files)):
 
         if (not isTexture):
             val = similarityColor(query_img, dataset_images[i])  # Mode warna
         else:
-            val = similarityTexture(query_img, images[i])  # Mode tekstur
+            val = similarityTexture(query_img, dataset_images[i])  # Mode tekstur
         if val >= 0.6:
             similarity_values.append(val)
+            result_dataset_files.append(dataset_files[i]) # ```revisi aldy
+            
 
-    dataset_files = dataset_files[:len(similarity_values)]
-    for i in range(len(dataset_files)):
-        for j in range(len(dataset_files)):
+    # dataset_files = dataset_files[:len(similarity_values)] # gak gini gan -Aldy
+    for i in range(len(result_dataset_files)):
+        for j in range(len(result_dataset_files)):
             if similarity_values[i] > similarity_values[j]:
                 similarity_values[i], similarity_values[j] = similarity_values[j], similarity_values[i]
-                dataset_files[i], dataset_files[j] = dataset_files[j], dataset_files[i]
+                result_dataset_files[i], result_dataset_files[j] = result_dataset_files[j], result_dataset_files[i]
 
-    dataset_files_relative_path = [0 for i in range(len(dataset_files))]
-    for i in range(len(dataset_files)):
-        path = dataset_files[i].split('\\')
+    dataset_files_relative_path = [0 for i in range(len(result_dataset_files))]
+    for i in range(len(result_dataset_files)):
+        path = result_dataset_files[i].split('\\')
         dataset_files_relative_path[i] = '/' + \
             path[len(path)-2] + '/' + path[len(path)-1]
 
-    for i in range(len(dataset_files)):
+    for i in range(len(result_dataset_files)):
         if i != 0:
-            print(f"{i}:", dataset_files[i], "{:.2f}".format(
+            print(f"{i}:", result_dataset_files[i], "{:.2f}".format(
                 similarity_values[i] * 100))
 
     end = time.time()
