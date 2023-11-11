@@ -27,4 +27,9 @@ export const sidebarLinks: SidebarLink[] = [
     route: "/search",
     label: "How To Use",
   },
+  {
+    imgURL: "/assets/icons/realtime.svg",
+    route: "/realtime",
+    label: "Real Time Experience",
+  },
 ];
