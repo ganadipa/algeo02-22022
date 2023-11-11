@@ -5,7 +5,7 @@ import time
 
 
 def getSimiliarity(query):
-    parent = "C:\\ITB\\Semester 3\\algeo\\gana\\algeo02-22022\\media"
+    parent = "C:\\ITB\\Semester 3\\algeo\\gana\\algeo02-22022\\public"
     dataset_files = loadFolder(parent + "\\dataset_images\\")
     dataset_images = loadImages(dataset_files)
     query_img = Image.open(query)
@@ -16,25 +16,34 @@ def getSimiliarity(query):
 
         val = similarityColor(query_img, dataset_images[i]) # Mode warna
         # val = similarityTexture(query_img, images[i]) # Mode tekstur
+        if val >= 0.6:
+            similarity_values.append(val)
 
-        similarity_values.append(val)
-
+    dataset_files = dataset_files[:len(similarity_values)]
     for i in range(len(dataset_files)):
         for j in range(len(dataset_files)):
             if similarity_values[i] > similarity_values[j]:
                 similarity_values[i], similarity_values[j] = similarity_values[j], similarity_values[i]
                 dataset_files[i], dataset_files[j] = dataset_files[j], dataset_files[i]
 
+    dataset_files_relative_path = [ 0 for i in range(len(dataset_files))]
+    for i in range(len(dataset_files)):
+        path = dataset_files[i].split('\\')
+        dataset_files_relative_path[i] = '/' + path[len(path)-2] + '/' + path[len(path)-1]
+
+    
     for i in range(len(dataset_files)):
         if i != 0:
             print(f"{i}:", dataset_files[i], "{:.2f}".format(similarity_values[i] * 100))
 
 
+    
+    
     end = time.time()
     return {
         "duration": end-start,
         "similiarity_arr": similarity_values,
-        "dataset":dataset_files
+        "dataset":dataset_files_relative_path
     }
 
 # main

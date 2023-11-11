@@ -1,8 +1,7 @@
 "use client";
 
-import FileUpload from "../components/FileUpload";
+import FileUpload, { searchResultType } from "../components/FileUpload";
 import SkeletonLoading from "../components/LoadingSkeleton";
-import IMAGE_RESULT from "../../constant/Main";
 import Image from "next/image";
 import React, { useState } from "react";
 
@@ -105,14 +104,30 @@ const ShowLessThan4 = ({
 const Main = ({ searchParams }: MainPageProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [numpage, setNumpage] = useState<number>(1);
-  const [selectedImage, setSelectedImage] = useState<
-    string | ArrayBuffer | null
-  >(null);
+  const [datasetUploaded, setDatasetUploaded] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(false);
+  const [searchResult, setSearchResult] = useState<searchResultType>({
+    data: [],
+    length: 0,
+  });
+  const router = useRouter();
 
   const idxMin = (numpage - 1) * 6;
-  const idxMax = Math.min(IMAGE_RESULT.length, numpage * 6);
-  const SHOWING_IMAGES = IMAGE_RESULT.slice(idxMin, idxMax);
-  const maxpage = Math.ceil(IMAGE_RESULT.length / 6);
+  const idxMax = Math.min(searchResult.data.length, numpage * 6);
+  const SHOWING_IMAGES = searchResult.data.slice(idxMin, idxMax);
+  const maxpage = Math.ceil(searchResult.data.length / 6);
+
+  // temporary
+  const [secs, setSecs] = useState(0);
+  const [filename, setFilename] = useState("hello");
+  const [loadingImages, setLoadingImages] = useState([
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+  ]);
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -151,7 +166,7 @@ const Main = ({ searchParams }: MainPageProps) => {
             <FileUpload
               setLoading={setLoading}
               setSelectedImage={setSelectedImage}
-              selectedImage={selectedImage}
+              setSearchResult={setSearchResult}
             />
           </div>
         </section>
@@ -160,19 +175,22 @@ const Main = ({ searchParams }: MainPageProps) => {
         <hr className="rounded-full border-[1.5px] border-slate-500" />
         {/* search result */}
         <section className="flex w-full flex-col ">
-          <div className="mb-4 flex flex-row justify-between">
-            <h4 className="font-semibold text-green-400">Result</h4>
-            <p>{IMAGE_RESULT.length} Results in 0.57 seconds.</p>
+          <div className="flex flex-row justify-between mb-4">
+            <h4 className="text-green-400 font-semibold">Result</h4>
+            <p>
+              {searchResult.data.length} Results in{" "}
+              {Math.floor(searchResult.duration)} seconds.
+            </p>
           </div>
 
           <div className="mb-4 grid grid-cols-2 gap-4 max-md:h-[50vh] md:grid-cols-3">
             {SHOWING_IMAGES.map((img, ind) => {
               return (
                 <div key={ind} className="relative aspect-video md:w-[33vh]">
-                  <Image src={img.url} alt="" fill objectFit="cover" />
-                  <div className="primary-gradient absolute left-0 top-0 rounded px-2 py-0.5 text-white">
+                  <Image src={img.image} alt="" fill objectFit="cover" />
+                  <div className="primary-gradient rounded absolute left-0 top-0 text-white px-2 py-0.5">
                     <span className="">
-                      {Math.round(img.similiarityrate)} %
+                      {img.similiarityRate.toFixed(2) * 100} %
                     </span>
                   </div>
                 </div>

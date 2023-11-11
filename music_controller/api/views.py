@@ -231,7 +231,6 @@ class ImageUploadView(APIView):
             end_time = time.time()
             print(f"Time taken to upload: {end_time - start_time} seconds")
             
-            return JsonResponse({
-                'message':response}, status=status.HTTP_201_CREATED)
+            return JsonResponse(response, status=status.HTTP_201_CREATED)
         # except Exception as e:
         #     return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
