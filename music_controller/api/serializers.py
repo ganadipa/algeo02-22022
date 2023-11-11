@@ -20,3 +20,4 @@ class ImageModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageModel
         fields = ('id', 'image', 'uploaded_at')
+        

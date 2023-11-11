@@ -7,8 +7,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+from rest_framework.parsers import FormParser, MultiPartParser
+from django.http import JsonResponse
+# include cbir_texture.py in cbir folder
+#include CBIR_Algorithm folder
+import os
+from api.CBIR_Algorithm.CBIR_Texture import similarityTexture
 # Create your views here.
-
+from django.conf import settings
+import time
+import zipfile
+from api.CBIR_Algorithm.Driver import getSimiliarity
 
 class RoomView(generics.CreateAPIView):
     queryset = Room.objects.all()
@@ -84,20 +93,145 @@ class CreateRoomView(APIView):
         # return Response({'Bad Request': 'invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# class ImageUploadView(APIView):
+#     def post(self, request, format=None):
+#         try:
+#             # Check if 'image' is in the uploaded files
+#             if 'image' not in request.FILES:
+#                 raise ValueError("No 'image' file in the request")
+
+#             # Save the uploaded image to the model
+#             uploaded_image = ImageModel(image=request.FILES['image'])
+#             uploaded_image.save()
+
+#             # Serialize the model instance for the response
+#             serializer = ImageModelSerializer(uploaded_image)
+
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# class ImageUploadView(APIView):
+#     parser_classes = (FormParser, MultiPartParser)
+
+#     def post(self, request, format=None):
+#         try:
+#             # Check if 'query' is in the uploaded files
+#             if 'query' not in request.FILES:
+#                 raise ValueError("No 'query' file in the request")
+
+#             # Save the query image to the model
+#             query_image = ImageModel(image=request.FILES['query'])
+#             query_image.save()
+
+#             # Save the dataset images to the model
+#             dataset_images = [ImageModel(image=file) for file in request.FILES.getlist('dataset')]
+#             ImageModel.objects.bulk_create(dataset_images)
+
+#             # Serialize the model instances for the response
+#             query_serializer = ImageModelSerializer(query_image)
+#             dataset_serializer = ImageModelSerializer(dataset_images, many=True)
+
+#             return Response({'query_image': query_serializer.data, 'dataset_images': dataset_serializer.data}, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+# class ImageUploadView(APIView):
+#     parser_classes = (FormParser, MultiPartParser)
+
+#     def post(self, request, format=None):
+#         try:
+#             # Save the query image to the local folder
+#             query_image = request.FILES['query_image']
+#             query_image_path = os.path.join(settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
+#             with open(query_image_path, 'wb') as f:
+#                 for chunk in query_image.chunks():
+#                     f.write(chunk)
+
+#             # Get the path to the dataset folder
+#             dataset_folder_path = os.path.join(settings.MEDIA_ROOT, 'dataset_images')
+
+#             # Calculate image similarities
+#             similarities = similarityTexture(query_image_path, dataset_folder_path)
+
+#             return Response({'similar_images': similarities}, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            
+            
+            
 class ImageUploadView(APIView):
+    parser_classes = (FormParser, MultiPartParser)
+    root = "C:\\ITB\\Semester 3\\algeo\\gana\\algeo02-22022\\"
+
+    def image_similarity(query_image_path, dataset_folder_path):
+        similarities = []
+        for dataset_image_name in os.listdir(dataset_folder_path):
+            dataset_image_path = os.path.join(dataset_folder_path, dataset_image_name)
+            similarity_score = similarityTexture(query_image_path, dataset_image_path)
+            if similarity_score > 0.6:
+                similarities.append({'image_path': dataset_image_path, 'similarity_score': similarity_score})
+
+        return similarities
     def post(self, request, format=None):
-        try:
-            # Check if 'image' is in the uploaded files
-            if 'image' not in request.FILES:
-                raise ValueError("No 'image' file in the request")
+        # try:
+            
+            # use time to get how long to upload
+            start_time = time.time()
+            
 
-            # Save the uploaded image to the model
-            uploaded_image = ImageModel(image=request.FILES['image'])
-            uploaded_image.save()
+            # return JsonResponse({'message': len(request.FILES)}, status=status.HTTP_201_CREATED)
+            
+            query_folder_path = os.path.join(settings.MEDIA_ROOT, 'uploaded_images')
+            for existing_image_name in os.listdir(query_folder_path):
+                existing_image_path = os.path.join(query_folder_path, existing_image_name)
+                os.remove(existing_image_path)
+                print(f"Existing query image deleted: {existing_image_path}")
+            
+            query_image = request.FILES.get('query')
+            if query_image:
+                query_image_path = os.path.join(settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
+                with open(query_image_path, 'wb') as f:
+                    for chunk in query_image.chunks():
+                        f.write(chunk)
+                print(f"Query image saved to: {query_image_path}")
 
-            # Serialize the model instance for the response
-            serializer = ImageModelSerializer(uploaded_image)
+            # Save the dataset images to the local folder
+            
+            
+            dataset_folder_path = os.path.join(settings.MEDIA_ROOT, 'dataset_images')
+            for existing_image_name in os.listdir(dataset_folder_path):
+                existing_image_path = os.path.join(dataset_folder_path, existing_image_name)
+                os.remove(existing_image_path)
+                print(f"Existing dataset image deleted: {existing_image_path}")
+                
+                
+                
+            for i in range(len(request.FILES)-1):
+                dataset_image = request.FILES.get(f'dataset[{i}]')
+                if dataset_image:
+                    dataset_image_path = os.path.join(settings.MEDIA_ROOT, 'dataset_images', dataset_image.name)
+                    with open(dataset_image_path, 'wb') as f:
+                        for chunk in dataset_image.chunks():
+                            f.write(chunk)
+                    print(f"Query image saved to: {dataset_image_path}")
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            print(f"Query image path: {query_image_path}")
+            print(f"Dataset folder path: {dataset_folder_path}")
+            
+            response = getSimiliarity(self.root+query_image_path)
+            # similarities = self.image_similarity(query_image_path, dataset_folder_path)
+            # print(f"Similarities: {similarities}")
+            # end time and print
+            end_time = time.time()
+            print(f"Time taken to upload: {end_time - start_time} seconds")
+            
+            return JsonResponse({
+                'message':response}, status=status.HTTP_201_CREATED)
+        # except Exception as e:
+        #     return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
