@@ -38,7 +38,7 @@ type dataType = list of {
 
 example = [
     {
-        "hash": "5b47d30988c7465e09b4ad7aefdb6556751449b1d837dcdd2a398e74ee8a597c",
+        "hash": f"5b47d30988c7465e09b4ad7aefdb6556751449b1d837dcdd2a398e74ee8a597c{i}",
         "attribute": {
             "array_1": [1 for i in range(36)],
             "array_2": [2 for i in range(36)],
@@ -50,36 +50,7 @@ example = [
             "array_8": [8 for i in range(36)],
             "array_9": [9 for i in range(36)],
         }
-    },
-
-    {
-        "hash": "6b47d30988c7465e09b4ad7aefdb6556751449b1d837dcdd2a398e74ee8a597c",
-        "attribute": {
-            "array_1": [1 for i in range(36)],
-            "array_2": [2 for i in range(36)],
-            "array_3": [3 for i in range(36)],
-            "array_4": [4 for i in range(36)],
-            "array_5": [5 for i in range(36)],
-            "array_6": [6 for i in range(36)],
-            "array_7": [7 for i in range(36)],
-            "array_8": [8 for i in range(36)],
-            "array_9": [9 for i in range(36)],
-        }
-    },
-    {
-        "hash": "7b47d30988c7465e09b4ad7aefdb6556751449b1d837dcdd2a398e74ee8a597c",
-        "attribute": {
-            "array_1": [1 for i in range(36)],
-            "array_2": [2 for i in range(36)],
-            "array_3": [3 for i in range(36)],
-            "array_4": [4 for i in range(36)],
-            "array_5": [5 for i in range(36)],
-            "array_6": [6 for i in range(36)],
-            "array_7": [7 for i in range(36)],
-            "array_8": [8 for i in range(36)],
-            "array_9": [9 for i in range(36)],
-        }
-    },
+    } for i in range(10000)
 
 ]
 
@@ -166,7 +137,7 @@ def get_index_by_abspath_image(data, abspath):
     # pastiin datanya sorted karena mau pake binary search
     # if not found return -1
     hash_value = custom_hash(abspath)
-    print(hash_value)
+    # print(hash_value)
     lo = 0
     hi = len(data)-1
     while (lo <= hi):
@@ -353,7 +324,7 @@ def get_cache():
 
             i += 1
 
-    print(data)
+    return data
 
 
 def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, array5, array6, array7, array8, array9):
@@ -401,12 +372,9 @@ if __name__ == '__main__':
     root = os.path.abspath(".") + '\\'
     dataset = root + 'public\\uploaded_images\\sunflower.jpg'
     start = time.time()
-    for i in range(5000):
-        custom_hash(dataset)
-        if (i % 1000 == 0):
-            print(i)
-    print(time.time() - start)
-    # update_database(example)
+    update_database(example)
+    get_cache()
+    print(time.time() - start)  # 1.3640406131744385
 
     # new = append_hash_and_9arrays(
     #     example, "hehe", [], [], [], [], [], [], [], [], [])
