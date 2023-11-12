@@ -16,18 +16,26 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     # ```revisi aldy -> bikin list baru buat result files nya
     result_dataset_files = list()
 
-    def inside_loop(i: int, query_img: Image):
+    def inside_loopTexture(i: int, querySomething : list[float]):
         print(f"start: {i}")
-        if (not isTexture):
-            val = similarityColor(query_img, dataset_images[i])  # Mode warna
-        else:
-            val = similarityTexture(
-                query_img, dataset_images[i])  # Mode tekstur
+
+        val = similarityTextureV2(
+            querySomething, dataset_images[i])  # Mode tekstur
         if val >= 0.6:
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
         print(f"end: {i}")
+    
+    def inside_loopColor(i: int, querySomething : Image):
+        print(f"start: {i}")
 
+        val = similarityColor(querySomething, dataset_images[i])
+        
+        if val >= 0.6:
+            similarity_values.append(val)
+            result_dataset_files.append(dataset_files[i])
+            
+        
     # for i in range(len(dataset_files)):
     #     inside_loop(i)
     i = [-1]
@@ -36,20 +44,32 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     threads = [0 for i in range(NUM_THREAD)]
     load = [0 for i in range(NUM_THREAD)]
 
-    def thread_workload(label, queryImg: Image):
-        while i[0]+1 < length_dataset:
-            i[0] += 1
-            inside_loop(i[0], queryImg)
-            load[label] += 1
+    def thread_workload(label, querySomething):
+        if isTexture:
+            while i[0]+1 < length_dataset:
+                i[0] += 1
+                inside_loopTexture(i[0], querySomething)
+                load[label] += 1
+                
+        else:
+            while i[0]+1 < length_dataset:
+                i[0] += 1
+                inside_loopColor(i[0], querySomething)
+                load[label] += 1
 
+    # make queryImg as a file in uploaded_images folder
+    queryImg = Image.open(query)
+    query_GLCM = CalculateGLCMMatrix(queryImg)
+    query_contrast, query_homogeneity, query_entropy = calculateFeatures(query_GLCM)
+    query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
+    
     for k in range(NUM_THREAD):
-        print("STARTING LABEL:", k)
-        dirname = os.path.dirname(query)
-        basename, ext = os.path.splitext(os.path.basename(query))
-        new_filename = f'{basename}_{k}{ext}'
-        img = Image.open(os.path.join(dirname, new_filename))
-        t = CustomThread(target=thread_workload,
-                         args=(k, img))
+        if(isTexture):
+            t = CustomThread(target=thread_workload,
+                         args=(k, query_CHEvector))
+        else:
+            t = CustomThread(target=thread_workload,
+                         args=(k, queryImg))
         t.start()
         threads[k] = t
 
@@ -89,17 +109,24 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     #         t5.join()
 
     # dataset_files = dataset_files[:len(similarity_values)] # gak gini gan -Aldy
+    
+    #SORTING
+    
     for i in range(len(result_dataset_files)):
         for j in range(len(result_dataset_files)):
             if similarity_values[i] > similarity_values[j]:
                 similarity_values[i], similarity_values[j] = similarity_values[j], similarity_values[i]
                 result_dataset_files[i], result_dataset_files[j] = result_dataset_files[j], result_dataset_files[i]
 
+
+
     dataset_files_relative_path = [0 for i in range(len(result_dataset_files))]
     for i in range(len(result_dataset_files)):
         path = result_dataset_files[i].split('\\')
         dataset_files_relative_path[i] = '/' + \
             path[len(path)-2] + '/' + path[len(path)-1]
+
+
 
     for i in range(len(result_dataset_files)):
         if i != 0:

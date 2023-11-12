@@ -18,3 +18,7 @@ def loadImages(filenames: list[str]):
         dataset.append(Image.open(filename))
     
     return dataset
+
+# def loadImages(filenames: list[str]):
+#     for filename in filenames:
+#         yield Image.open(filename)
