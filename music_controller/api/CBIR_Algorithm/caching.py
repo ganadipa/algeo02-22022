@@ -38,7 +38,7 @@ type dataType = list of {
 
 example = [
     {
-        "hash": f"5b47d30988c7465e09b4ad7aefdb6556751449b1d837dcdd2a398e74ee8a597c{i}",
+        "hash": f"7b47d30988c7465e09b4ad7aefdb6556751449b1d837dcdd2a398e74ee8a597c",
         "attribute": {
             "array_1": [1 for i in range(36)],
             "array_2": [2 for i in range(36)],
@@ -50,7 +50,7 @@ example = [
             "array_8": [8 for i in range(36)],
             "array_9": [9 for i in range(36)],
         }
-    } for i in range(10000)
+    } for i in range(1)
 
 ]
 
@@ -373,6 +373,8 @@ if __name__ == '__main__':
     dataset = root + 'public\\uploaded_images\\sunflower.jpg'
     start = time.time()
     update_database(example)
+    print(time.time() - start)
+    start = time.time()
     get_cache()
     print(time.time() - start)  # 1.3640406131744385
 
