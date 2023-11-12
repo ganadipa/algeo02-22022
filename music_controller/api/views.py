@@ -19,6 +19,7 @@ import time
 import zipfile
 from api.CBIR_Algorithm.Driver import getSimiliarity
 import shutil
+from pathlib import Path
 
 
 class RoomView(generics.CreateAPIView):
@@ -198,32 +199,20 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
-        query_image_real_path = os.path.join(
-            settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
-        for i in range(NUM_THREAD):
-            if query_image:
-                # Split the filename and extension
-                base_name, extension = os.path.splitext(query_image.name)
-
-                # Construct the new filename with the loop index
-                new_filename = f"{base_name}_{i}{extension}"
-
-                query_image_path = os.path.join(
-                    settings.MEDIA_ROOT, 'uploaded_images', new_filename)
-
-                with open(query_image_path, 'wb') as f:
-                    for chunk in query_image.chunks():
-                        f.write(chunk)
-                print(f"Query image saved to: {query_image_path}")
+        if query_image:
+            query_image_path = os.path.join(
+                settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
+            with open(query_image_path, 'wb') as f:
+                for chunk in query_image.chunks():
+                    f.write(chunk)
+            print(f"Query image saved to: {query_image_path}")
 
         # Save the dataset images to the local folder
 
-        dataset_folder_path = os.path.join(
-            settings.MEDIA_ROOT, 'dataset_images')
-        for existing_image_name in os.listdir(dataset_folder_path):
-            existing_image_path = os.path.join(
-                dataset_folder_path, existing_image_name)
-            os.remove(existing_image_path)
+
+        dataset_folder_path = Path(settings.MEDIA_ROOT) / 'dataset_images'
+        for existing_image_path in dataset_folder_path.iterdir():
+            existing_image_path.unlink()
             print(f"Existing dataset image deleted: {existing_image_path}")
 
         for i in range(len(request.FILES)-1):
@@ -234,11 +223,14 @@ class ImageUploadView(APIView):
                 with open(dataset_image_path, 'wb') as f:
                     for chunk in dataset_image.chunks():
                         f.write(chunk)
-                print(f"Query image saved to: {dataset_image_path}")
+                print(f"Dataset image saved to: {dataset_image_path}")
 
+        # start time
+        
         response = getSimiliarity(
-            self.root+query_image_real_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
-
+            self.root+query_image_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
+        # end time and print
+ 
         # similarities = self.image_similarity(query_image_path, dataset_folder_path)
         # print(f"Similarities: {similarities}")
         # end time and print
