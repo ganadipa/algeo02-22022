@@ -2,6 +2,7 @@ from PIL import Image
 import hashlib
 import os
 import csv
+import time
 
 
 def custom_hash(abspath_image):
@@ -380,7 +381,9 @@ def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, arra
 
     while (lo < hi):
         mid = (hi + lo)//2
-        if (data[mid]['hash'] > hash_val):
+        if (data[mid]['hash'] >= hash_val):
+            if (data[mid]['hash'] == hash_val):
+                return data
             hi = mid
         else:
             lo = mid + 1
@@ -396,10 +399,17 @@ def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, arra
 
 if __name__ == '__main__':
     root = os.path.abspath(".") + '\\'
-    update_database(example)
+    dataset = root + 'public\\uploaded_images\\sunflower.jpg'
+    start = time.time()
+    for i in range(5000):
+        custom_hash(dataset)
+        if (i % 1000 == 0):
+            print(i)
+    print(time.time() - start)
+    # update_database(example)
 
-    new = append_hash_and_9arrays(
-        example, "hehe", [], [], [], [], [], [], [], [], [])
-    newagain = append_hash_and_9arrays(
-        new, "1hehe", [], [], [], [], [], [], [], [], [])
-    print(newagain)
+    # new = append_hash_and_9arrays(
+    #     example, "hehe", [], [], [], [], [], [], [], [], [])
+    # newagain = append_hash_and_9arrays(
+    #     new, "1hehe", [], [], [], [], [], [], [], [], [])
+    # print(newagain)
