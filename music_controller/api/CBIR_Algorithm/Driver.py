@@ -16,18 +16,26 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     # ```revisi aldy -> bikin list baru buat result files nya
     result_dataset_files = list()
 
-    def inside_loop(i: int, query_img: Image):
+    def inside_loopTexture(i: int, querySomething : list[float]):
         print(f"start: {i}")
-        if (not isTexture):
-            val = similarityColor(query_img, dataset_images[i])  # Mode warna
-        else:
-            val = similarityTextureV2(
-                query_img, dataset_images[i])  # Mode tekstur
+
+        val = similarityTextureV2(
+            querySomething, dataset_images[i])  # Mode tekstur
         if val >= 0.6:
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
         print(f"end: {i}")
+    
+    def inside_loopColor(i: int, querySomething : Image):
+        print(f"start: {i}")
 
+        val = similarityColor(querySomething, dataset_images[i])
+        
+        if val >= 0.6:
+            similarity_values.append(val)
+            result_dataset_files.append(dataset_files[i])
+            
+        
     # for i in range(len(dataset_files)):
     #     inside_loop(i)
     i = [-1]
@@ -40,13 +48,13 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         if isTexture:
             while i[0]+1 < length_dataset:
                 i[0] += 1
-                inside_loop(i[0], querySomething)
+                inside_loopTexture(i[0], querySomething)
                 load[label] += 1
                 
         else:
             while i[0]+1 < length_dataset:
                 i[0] += 1
-                inside_loop(i[0], querySomething)
+                inside_loopColor(i[0], querySomething)
                 load[label] += 1
 
     # make queryImg as a file in uploaded_images folder

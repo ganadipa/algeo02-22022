@@ -7,44 +7,44 @@ import time
 """ Actual Stuff """
 # Grayscale rgb conversion
 def GrayScaleValue(R: int, G: int, B: int) -> float:
-    return int((0.29 * R + 0.587 * G + 0.114 * B) // 16)
+    return int((0.29 * R + 0.587 * G + 0.114 * B))
 
 
 # Do stuff
 def CalculateGLCMMatrix(img: Image) -> list[list[int]]:
 
     # Declare stuff
-    glcmMatrix = [[0 for i in range(16)] for j in range(16)]
-    glcmMatrixTranspose = [[0 for i in range(16)] for j in range(16)]
+    glcmMatrix = [[0 for i in range(256)] for j in range(256)]
+    glcmMatrixTranspose = [[0 for i in range(256)] for j in range(256)]
 
     # Load stuff
     img = img.convert('RGB')
     width, height = img.size
     pixels = img.load()
 
-    compression_x = 3
-    compression_y = 3
+    compression_x = 1
+    compression_y = 1
     normalizing_constant = (2 / 9) * (width) * (height)
 
     # Process stuff
-    for y in range(2, height, compression_y):
-        for x in range(2, width, compression_x):
+    for y in range(1, height, compression_y):
+        for x in range(1, width, compression_x):
 
 
             R,G,B = pixels[x, y]
             Y1 = GrayScaleValue(R,G,B)
 
-            R,G,B = pixels[x - 2, y - 2]
+            R,G,B = pixels[x - 1, y - 1]
             Y2 = GrayScaleValue(R,G,B)
 
             glcmMatrix[Y1][Y2] += 1
             glcmMatrixTranspose[Y2][Y1] += 1
 
     # Add glcm with glcm^T
-    for i in range(16):
-        for j in range(16):
+    for i in range(256):
+        for j in range(256):
             glcmMatrix[i][j] += glcmMatrixTranspose[i][j]
-            glcmMatrix[i][j] /= normalizing_constant
+            # glcmMatrix[i][j] /= normalizing_constant
 
     return glcmMatrix
 
