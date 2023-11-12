@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import LeftSidebar from "../components/navbar/LeftSidebar";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} flex h-[100dvh] flex-col bg-slate-200 ${spaceGrotesk.variable}`}
       >
+        <Toaster />
         <div className="">
           <LeftSidebar />
         </div>

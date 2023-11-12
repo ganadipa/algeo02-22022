@@ -3,7 +3,7 @@
 import FileUpload, { searchResultType } from "../components/FileUpload";
 import SkeletonLoading from "../components/LoadingSkeleton";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type PagingButtonHelperProps = {
   numpage: number;
@@ -110,7 +110,30 @@ const Main = ({ searchParams }: MainPageProps) => {
   const [searchResult, setSearchResult] = useState<searchResultType>({
     data: [],
     duration: 0,
+    ok: false,
+    loading: false,
   });
+  const [showResultLoading, setShowResultLoading] = useState([
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+  ]);
+
+  useEffect(() => {
+    setShowResultLoading([true, true, true, true, true, true]);
+  }, [numpage]);
+
+  function handleOnImageLoad(ind: number) {
+    setShowResultLoading((prev) => {
+      prev[ind] = false;
+      return prev;
+    });
+  }
+
+  useEffect(() => console.log(showResultLoading), [showResultLoading]);
 
   const idxMin = (numpage - 1) * 6;
   const idxMax = Math.min(searchResult.data.length, numpage * 6);
@@ -155,65 +178,119 @@ const Main = ({ searchParams }: MainPageProps) => {
               setLoading={setLoading}
               setSelectedImage={setSelectedImage}
               setSearchResult={setSearchResult}
+              searchResult={searchResult}
             />
           </div>
         </section>
         {/* result section */}
 
         <hr className="rounded-full border-[1.5px] border-slate-500" />
+
         {/* search result */}
-        <section className="flex w-full flex-col ">
-          <div className="mb-4 flex flex-row justify-between">
-            <h4 className="font-semibold text-green-400">Result</h4>
-            <p>
-              {searchResult.data.length} Results in{" "}
-              {Math.floor(searchResult.duration)} seconds.
+        {searchResult.ok ? (
+          <section className="flex w-full flex-col ">
+            <div className="mb-4 flex flex-row justify-between">
+              <h4 className="font-semibold text-green-400">Result</h4>
+              <p>
+                {searchResult.data.length} Results in{" "}
+                {Math.floor(searchResult.duration)} seconds.
+              </p>
+            </div>
+
+            <div className="mb-4 grid grid-cols-2 gap-4 max-md:h-[50vh] md:grid-cols-3">
+              {SHOWING_IMAGES.map((img, ind) => {
+                return (
+                  <div
+                    key={ind + numpage * 6}
+                    className="relative aspect-video md:w-[33vh]"
+                  >
+                    <>
+                      <Image
+                        src={img.image}
+                        alt=""
+                        fill
+                        objectFit="cover"
+                        onLoad={() => handleOnImageLoad(ind)}
+                      />
+                      <div className="primary-gradient absolute left-0 top-0 rounded px-2 py-0.5 text-white">
+                        <span className="">
+                          {Math.floor(img.similiarityRate * 100)} %
+                        </span>
+                      </div>
+                    </>
+
+                    {showResultLoading[ind] ? null : (
+                      <SkeletonLoading
+                        className="h-full w-full animate-pulse"
+                        color="bg-gray-300"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination button */}
+            <div className="mb-4 flex flex-row justify-center gap-2">
+              {/* Left arrow button */}
+              {numpage !== 1 && (
+                <button onClick={() => setNumpage((numpage) => numpage - 1)}>
+                  &lt;
+                </button>
+              )}
+
+              {/* Handle styling */}
+              {maxpage > 3 ? (
+                <ShowGreaterThan3
+                  numpage={numpage}
+                  maxpage={maxpage}
+                  setNumpage={setNumpage}
+                />
+              ) : (
+                <ShowLessThan4
+                  numpage={numpage}
+                  maxpage={maxpage}
+                  setNumpage={setNumpage}
+                />
+              )}
+
+              {/* Right arrow button */}
+              {numpage !== maxpage && (
+                <button onClick={() => setNumpage((np) => np + 1)}>&gt;</button>
+              )}
+            </div>
+          </section>
+        ) : searchResult.loading ? (
+          <section className="flex w-full flex-col ">
+            <div className="mb-4 flex flex-row justify-center">
+              <p className="font-semibold text-white">Searching...</p>
+            </div>
+
+            <div className="mb-4 grid grid-cols-2 gap-4 max-md:h-[50vh] md:grid-cols-3">
+              {Array.from({ length: 6 }).map((img, ind) => {
+                return (
+                  <div key={ind} className="relative aspect-video md:w-[33vh]">
+                    <SkeletonLoading
+                      className="h-full w-full animate-pulse"
+                      color="bg-gray-300"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <div
+              className="mb-4 flex flex-row justify-center gap-2"
+              content=""
+            ></div>
+          </section>
+        ) : (
+          <div className=" flex items-center justify-center">
+            <p className="font-semibold">
+              Please Upload the image and the dataset first, then click search
+              by tekcture or color
             </p>
           </div>
-
-          <div className="mb-4 grid grid-cols-2 gap-4 max-md:h-[50vh] md:grid-cols-3">
-            {SHOWING_IMAGES.map((img, ind) => {
-              return (
-                <div key={ind} className="relative aspect-video md:w-[33vh]">
-                  <Image src={img.image} alt="" fill objectFit="cover" />
-                  <div className="primary-gradient absolute left-0 top-0 rounded px-2 py-0.5 text-white">
-                    <span className="">{img.similiarityRate * 100} %</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Pagination button */}
-          <div className="mb-4 flex flex-row justify-center gap-2">
-            {/* Left arrow button */}
-            {numpage !== 1 && (
-              <button onClick={() => setNumpage((numpage) => numpage - 1)}>
-                &lt;
-              </button>
-            )}
-
-            {/* Handle styling */}
-            {maxpage > 3 ? (
-              <ShowGreaterThan3
-                numpage={numpage}
-                maxpage={maxpage}
-                setNumpage={setNumpage}
-              />
-            ) : (
-              <ShowLessThan4
-                numpage={numpage}
-                maxpage={maxpage}
-                setNumpage={setNumpage}
-              />
-            )}
-
-            {/* Right arrow button */}
-            {numpage !== maxpage && (
-              <button onClick={() => setNumpage((np) => np + 1)}>&gt;</button>
-            )}
-          </div>
-        </section>
+        )}
 
         <hr className="rounded-full border-[1.5px]  border-slate-500" />
       </main>

@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 const CBIREndpoint = "http://localhost:8000/api/upload-image/";
 
@@ -10,6 +11,8 @@ type responseType = {
 export type searchResultType = {
   data: responseType[];
   duration: number;
+  ok: boolean;
+  loading: boolean;
 };
 
 type BackendResponseType = {
@@ -24,12 +27,14 @@ type FileUploadType = {
   >;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchResult: React.Dispatch<searchResultType>;
+  searchResult: searchResultType;
 };
 
 const FileUpload = ({
   setSelectedImage,
   setLoading,
   setSearchResult,
+  searchResult,
 }: FileUploadType) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const datasetInputRef = useRef<HTMLInputElement | null>(null);
@@ -50,20 +55,31 @@ const FileUpload = ({
     reader.readAsDataURL(img);
   };
 
-  async function handleSubmit() {
+  async function handleSubmit(isColor: boolean) {
     try {
-      setLoading(true); // Assuming you want to set loading to true when submitting
+      const toastLoadingId = toast.loading("Searching...");
       const dataset = datasetInputRef.current?.files;
       const query = fileInputRef.current?.files;
       const formData = new FormData();
 
-      if (!query || !dataset) return; // nanti ganti pake toast kalo sempet
+      if (!query || !dataset) {
+        toast.error("Something went wrong!");
+        toast.dismiss(toastLoadingId);
+        return;
+      }
+      setSearchResult({
+        data: [],
+        duration: 0,
+        ok: false,
+        loading: true,
+      });
 
       const datasetArray = Array.from(dataset);
       formData.append("query", query[0] as File);
       datasetArray.forEach((file, index) => {
         formData.append(`dataset[${index}]`, file);
       });
+      formData.append("search_method", isColor ? "color" : "texture");
 
       const response = await fetch(CBIREndpoint, {
         method: "POST",
@@ -72,8 +88,15 @@ const FileUpload = ({
       });
 
       if (!response.ok) {
-        // Handle non-successful responses (e.g., server error)
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        setSearchResult({
+          data: [],
+          duration: 0,
+          ok: false,
+          loading: false,
+        });
+        toast.error("Something went wrong!");
+        toast.dismiss(toastLoadingId);
+        return;
       }
 
       const data: BackendResponseType = await response.json();
@@ -82,6 +105,8 @@ const FileUpload = ({
       const searchResultFromData: searchResultType = {
         data: [],
         duration: 0,
+        ok: true,
+        loading: false,
       };
 
       searchResultFromData.duration = data.duration;
@@ -92,13 +117,12 @@ const FileUpload = ({
         });
       }
 
-      // Set datasetUploaded state based on the response
       setDatasetUploaded(true);
       setSearchResult(searchResultFromData);
+      toast.success("Data result successfully arrived!");
+      toast.dismiss(toastLoadingId);
     } catch (error) {
       console.error("Error during fetch:", error);
-    } finally {
-      setLoading(false); // Assuming you want to set loading to false when the request completes
     }
   }
 
@@ -133,21 +157,27 @@ const FileUpload = ({
         {datasetUploaded && <p className="self-end">Dataset uploaded!</p>}
       </div>
       <div className="flex-between flex flex-row">
-        <p>Search by: </p>
-        <div className="flex flex-row max-md:gap-4 md:gap-8">
-          <button
-            className="rounded bg-slate-600 py-2 text-white max-md:px-2 md:w-[100px]"
-            onClick={handleSubmit}
-          >
-            Texture
-          </button>
-          <button
-            className="rounded bg-slate-600 py-2 text-white max-md:px-2 md:w-[100px]"
-            onClick={handleSubmit}
-          >
-            Color
-          </button>
-        </div>
+        {searchResult.loading ? (
+          <></>
+        ) : (
+          <>
+            <p>Search by: </p>
+            <div className="flex flex-row max-md:gap-4 md:gap-8">
+              <button
+                className="rounded bg-slate-600 py-2 text-white max-md:px-2 md:w-[100px]"
+                onClick={() => handleSubmit(false)}
+              >
+                Texture
+              </button>
+              <button
+                className="rounded bg-slate-600 py-2 text-white max-md:px-2 md:w-[100px]"
+                onClick={() => handleSubmit(true)}
+              >
+                Color
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

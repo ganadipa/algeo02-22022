@@ -180,6 +180,7 @@ class ImageUploadView(APIView):
         return similarities
 
     def post(self, request, format=None):
+
         # try:
 
         # use time to get how long to upload
@@ -195,17 +196,7 @@ class ImageUploadView(APIView):
             os.remove(existing_image_path)
             print(f"Existing query image deleted: {existing_image_path}")
 
-
-
-
-        """
-        Gua gk tau ini set nya gmn ntar ganti -Aldy
-        """
-        isTexture = False
-
-
-
-
+        isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
         if query_image:
@@ -239,7 +230,8 @@ class ImageUploadView(APIView):
         print(f"Query image path: {query_image_path}")
         print(f"Dataset folder path: {dataset_folder_path}")
 
-        response = getSimiliarity(self.root+query_image_path, isTexture) # MODE TEKSTUR/WARNA
+        response = getSimiliarity(
+            self.root+query_image_path, isTexture)  # MODE TEKSTUR/WARNA
 
         # similarities = self.image_similarity(query_image_path, dataset_folder_path)
         # print(f"Similarities: {similarities}")
