@@ -18,6 +18,7 @@ from django.conf import settings
 import time
 import zipfile
 from api.CBIR_Algorithm.Driver import getSimiliarity
+import shutil
 
 
 class RoomView(generics.CreateAPIView):
@@ -180,11 +181,9 @@ class ImageUploadView(APIView):
         return similarities
 
     def post(self, request, format=None):
+        NUM_THREAD = 5
 
         # try:
-
-        # use time to get how long to upload
-        start_time = time.time()
 
         # return JsonResponse({'message': len(request.FILES)}, status=status.HTTP_201_CREATED)
 
@@ -199,23 +198,25 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
-        if query_image:
-            query_image_path = os.path.join(
-                settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
-            with open(query_image_path, 'wb') as f:
-                for chunk in query_image.chunks():
-                    f.write(chunk)
-            print(f"Query image saved to: {query_image_path}")
+        query_image_real_path = os.path.join(
+            settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
+        for i in range(NUM_THREAD):
+            if query_image:
+                # Split the filename and extension
+                base_name, extension = os.path.splitext(query_image.name)
+
+                # Construct the new filename with the loop index
+                new_filename = f"{base_name}_{i}{extension}"
+
+                query_image_path = os.path.join(
+                    settings.MEDIA_ROOT, 'uploaded_images', new_filename)
+
+                with open(query_image_path, 'wb') as f:
+                    for chunk in query_image.chunks():
+                        f.write(chunk)
+                print(f"Query image saved to: {query_image_path}")
 
         # Save the dataset images to the local folder
-
-        dataset_folder_path = os.path.join(
-            settings.MEDIA_ROOT, 'dataset_images')
-        for existing_image_name in os.listdir(dataset_folder_path):
-            existing_image_path = os.path.join(
-                dataset_folder_path, existing_image_name)
-            os.remove(existing_image_path)
-            print(f"Existing dataset image deleted: {existing_image_path}")
 
         for i in range(len(request.FILES)-1):
             dataset_image = request.FILES.get(f'dataset[{i}]')
@@ -227,17 +228,12 @@ class ImageUploadView(APIView):
                         f.write(chunk)
                 print(f"Query image saved to: {dataset_image_path}")
 
-        print(f"Query image path: {query_image_path}")
-        print(f"Dataset folder path: {dataset_folder_path}")
-
         response = getSimiliarity(
-            self.root+query_image_path, isTexture)  # MODE TEKSTUR/WARNA
+            self.root+query_image_real_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
 
         # similarities = self.image_similarity(query_image_path, dataset_folder_path)
         # print(f"Similarities: {similarities}")
         # end time and print
-        end_time = time.time()
-        print(f"Time taken to upload: {end_time - start_time} seconds")
 
         return JsonResponse(response, status=status.HTTP_201_CREATED)
         # except Exception as e:

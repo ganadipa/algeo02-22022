@@ -6,19 +6,17 @@ import os
 from api.CBIR_Algorithm.CustomThreading import CustomThread
 
 
-def getSimiliarity(query, isTexture):
+def getSimiliarity(query, isTexture, NUM_THREAD):
     parent = os.path.abspath("./") + '\\public\\'
     dataset_files = loadFolder(parent + "\\dataset_images\\")
     dataset_images = loadImages(dataset_files)
-    query_img = Image.open(query)
     start = time.time()
     similarity_values = []
 
     # ```revisi aldy -> bikin list baru buat result files nya
     result_dataset_files = list()
 
-    def inside_loop(i: int):
-        print(f"starting i: {i}")
+    def inside_loop(i: int, query_img: Image):
         if (not isTexture):
             val = similarityColor(query_img, dataset_images[i])  # Mode warna
         else:
@@ -27,22 +25,36 @@ def getSimiliarity(query, isTexture):
         if val >= 0.6:
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
-        print(f"ending i: {i}")
 
-    # multithreading
-    i = [0]
+    # for i in range(len(dataset_files)):
+    #     inside_loop(i)
+    i = [-1]
     length_dataset: int = len(dataset_files)
 
-    def thread_workload():
-        while i[0] < length_dataset:
-            t = CustomThread(target=inside_loop, args=(i[0],))
-            t.start()
-            i[0] += 1
-            t.join()
+    threads = [0 for i in range(NUM_THREAD)]
+    load = [0 for i in range(NUM_THREAD)]
 
-    NUM_THREAD = 8
-    for j in range(NUM_THREAD):
-        thread_workload()
+    def thread_workload(label, queryImg: Image):
+        while i[0]+1 < length_dataset:
+            i[0] += 1
+            inside_loop(i[0], queryImg)
+            load[label] += 1
+
+    for k in range(NUM_THREAD):
+        print("STARTING LABEL:", k)
+        dirname = os.path.dirname(query)
+        basename, ext = os.path.splitext(os.path.basename(query))
+        new_filename = f'{basename}_{k}{ext}'
+        img = Image.open(os.path.join(dirname, new_filename))
+        t = CustomThread(target=thread_workload,
+                         args=(k, img))
+        t.start()
+        threads[k] = t
+
+    for k in range(NUM_THREAD):
+        threads[k].join()
+
+    print(load)
 
     # for i in range(0, length_dataset, 5):
     #     t1 = CustomThread(target=inside_loop, args=(i,))
