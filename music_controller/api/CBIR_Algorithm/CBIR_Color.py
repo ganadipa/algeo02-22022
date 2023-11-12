@@ -227,8 +227,8 @@ def calculateBlockSimilarity(image1: Image, image2: Image,
 
     # compression values; increase to increase spatial averaging -> higher performance with lower acc
     # (value of 1 means images are not compressed at all)
-    compression_x = 10
-    compression_y = 10
+    compression_x = 3
+    compression_y = 3
 
     # Calculate HSV Histogram / freq table for image 1
     LightColors1 = [0 for i in range(16)]
