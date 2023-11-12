@@ -1,4 +1,5 @@
 from PIL import Image
+from api.CBIR_Algorithm.caching import *
 import os
 
 """ Biar gk rusak """
@@ -215,15 +216,11 @@ def NewtonSqrt(num: float):
 # Obviously, pra kondisi: dimensi image harus lebih besar dari dimensi start/end dari block
 
 
-def calculateBlockSimilarity(image1: Image, image2: Image,
-                             start_x1, start_y1, end_x1, end_y1,
-                             start_x2, start_y2, end_x2, end_y2) -> float:
+def calculateBlockVector(image1: Image, start_x, start_y, end_x, end_y) -> list[float]:
 
     # Load stuff
     image1 = biarGakRusak(image1)
-    image2 = biarGakRusak(image2)
     pixels1 = image1.load()
-    pixels2 = image2.load()
 
     # compression values; increase to increase spatial averaging -> higher performance with lower acc
     # (value of 1 means images are not compressed at all)
@@ -231,12 +228,12 @@ def calculateBlockSimilarity(image1: Image, image2: Image,
     compression_y = 3
 
     # Calculate HSV Histogram / freq table for image 1
-    LightColors1 = [0 for i in range(16)]
-    DarkColors1 = [0 for i in range(16)]
-    GreyScaleColors1 = [0 for i in range(4)]
+    LightColors = [0 for i in range(16)]
+    DarkColors = [0 for i in range(16)]
+    GreyScaleColors = [0 for i in range(4)]
 
-    for y in range(start_y1, end_y1 - compression_y, compression_y):
-        for x in range(start_x1, end_x1 - compression_x, compression_x):
+    for y in range(start_y, end_y - compression_y, compression_y):
+        for x in range(start_x, end_x - compression_x, compression_x):
 
             # Access pixel color and allocate to {r,g,b}
             r, g, b = pixels1[x, y]
@@ -245,177 +242,145 @@ def calculateBlockSimilarity(image1: Image, image2: Image,
             idx = HSVToIndex(int(h), s, v)
 
             if s < 0.15:                          # Increment frequency of that color by +1
-                GreyScaleColors1[idx] += 1
+                GreyScaleColors[idx] += 1
                 if idx == 1 or idx == 2:
-                    GreyScaleColors1[idx-1] += 0.19628
-                    GreyScaleColors1[idx+1] += 0.19628
+                    GreyScaleColors[idx-1] += 0.19628
+                    GreyScaleColors[idx+1] += 0.19628
             else:
                 if v > 0.7:
-                    LightColors1[idx] += 1
-                    LightColors1[(idx - 1) % 16] += 0.499
-                    LightColors1[(idx + 1) % 16] += 0.499
-                    DarkColors1[idx] += 0.5
-                    DarkColors1[(idx - 1) % 16] += 0.2499
-                    DarkColors1[(idx + 1) % 16] += 0.2499
+                    LightColors[idx] += 1
+                    LightColors[(idx - 1) % 16] += 0.499
+                    LightColors[(idx + 1) % 16] += 0.499
+                    DarkColors[idx] += 0.5
+                    DarkColors[(idx - 1) % 16] += 0.2499
+                    DarkColors[(idx + 1) % 16] += 0.2499
                 else:
-                    DarkColors1[idx] += 1
-                    DarkColors1[(idx - 1) % 16] += 0.499
-                    DarkColors1[(idx + 1) % 16] += 0.499
-                    LightColors1[idx] += 0.5
-                    LightColors1[(idx - 1) % 16] += 0.2499
-                    LightColors1[(idx + 1) % 16] += 0.2499
+                    DarkColors[idx] += 1
+                    DarkColors[(idx - 1) % 16] += 0.499
+                    DarkColors[(idx + 1) % 16] += 0.499
+                    LightColors[idx] += 0.5
+                    LightColors[(idx - 1) % 16] += 0.2499
+                    LightColors[(idx + 1) % 16] += 0.2499
 
     # Di sini kita "increment sorrounding colors by weight"
 
-    # Calculate HSV Histogram / freq table for image 2
-    # Process is the same as image 1
-    LightColors2 = [0 for i in range(16)]
-    DarkColors2 = [0 for i in range(16)]
-    GreyScaleColors2 = [0 for i in range(4)]
-
-    for y in range(start_y2, end_y2 - compression_y, compression_y):
-        for x in range(start_x2, end_x2 - compression_x, compression_x):
-
-            r, g, b = pixels2[x, y]
-            h, s, v = RGBtoHSV(r, g, b)
-            idx = HSVToIndex(int(h), s, v)
-
-            if s < 0.15:
-                GreyScaleColors2[idx] += 1
-                if idx == 1 or idx == 2:
-                    GreyScaleColors2[idx-1] += 0.19628
-                    GreyScaleColors2[idx+1] += 0.19628
-            else:
-                if v > 0.7:
-                    LightColors2[idx] += 1
-                    LightColors2[(idx - 1) % 16] += 0.499
-                    LightColors2[(idx + 1) % 16] += 0.499
-                    DarkColors2[idx] += 0.5
-                    DarkColors2[(idx - 1) % 16] += 0.2499
-                    DarkColors2[(idx + 1) % 16] += 0.2499
-                else:
-                    DarkColors2[idx] += 1
-                    DarkColors2[(idx - 1) % 16] += 0.499
-                    DarkColors2[(idx + 1) % 16] += 0.499
-                    LightColors2[idx] += 0.5
-                    LightColors2[(idx - 1) % 16] += 0.2499
-                    LightColors2[(idx + 1) % 16] += 0.2499
 
     # Create 36 feature vector
-    color_vector1 = []
-    color_vector2 = []
+    color_vector = []
 
     for i in range(16):
-        color_vector1.append(LightColors1[i])
-        color_vector2.append(LightColors2[i])
+        color_vector.append(LightColors[i])
 
     for i in range(16):
-        color_vector1.append(DarkColors1[i])
-        color_vector2.append(DarkColors2[i])
+        color_vector.append(DarkColors[i])
 
     for i in range(4):
-        color_vector1.append(GreyScaleColors1[i])
-        color_vector2.append(GreyScaleColors2[i])
+        color_vector.append(GreyScaleColors[i])
 
     # Normalize vector
-    color_vector1 = normalize(color_vector1)
-    color_vector2 = normalize(color_vector2)
+    color_vector = normalize(color_vector)
 
-############################
-    """ DEBUGGING """
-############################
-    # print("Color data: ")
-    # for i in range(0,16,1):
-    #     print(f"i = {i}: ", "{:.4f}".format(colors1[i]), "{:.4f}".format(colors2[i]))
-
-    # print()
-    # print("Greyscale: ")
-    # for i in range(16,20,1):
-    #     print(f"i = {i}: ", "{:.4f}".format(colors1[i]), "{:.4f}".format(colors2[i]))
-
-    # print()
-
-    # Calculate color frequency similarity
-    # (karena sudah di-normalize, dot product adalah sama dengan cosine similarity
-    # karena panjang kedua vektor sudah 1 jadi tidak harus dibagi lagi)
-    dot_product = 0
-    for i in range(36):
-        dot_product += (color_vector1[i] * color_vector2[i])
-
-    return dot_product
+    return color_vector
 
 
-# COLOR SIMILARITY MAIN FUNCTION
-# The main function: Calculate similarity for each 3x3 block and multiply them with
-# their respective weight
-# The blocks are the following: (numbered from 1 to 3 based on their weight)
-# 1 2 2 3
-# 4 5 5 6
-# 4 5 5 6
-# 7 8 8 9
+def writeImageBlockVectors(data, path_img1): # RETURNS NEW DATA AFTER WRITING NEW IMG'S DATUM
 
-def similarityColor(image1: Image, image2: Image) -> float:
-    width1, height1 = image1.size
-    width2, height2 = image2.size
+    image = Image.open(path_img1)
+    width1, height1 = image.size
 
     m = 4
     k = 3
 
-    WQ1_img1 = width1 // m
-    WQ3_img1 = k * (width1 // m)
+    # Weight Quartile 1 and 3
+    WQ1_img = width1 // m
+    WQ3_img = k * (width1 // m)
 
-    HQ1_img1 = height1 // m
-    HQ3_img1 = k * (height1 // m)
+    # Height Quartile 1 and 3
+    HQ1_img = height1 // m
+    HQ3_img = k * (height1 // m)
 
-    WQ1_img2 = width2 // m
-    WQ3_img2 = k * (width2 // m)
-
-    HQ1_img2 = height2 // m
-    HQ3_img2 = k * (height2 // m)
-
-    result = 0
     # Blocks 1, 3, 7, and 9 (corners)
-    block1 = calculateBlockSimilarity(image1, image2,
-                                      0, 0, WQ1_img1, HQ1_img1,
-                                      0, 0, WQ1_img2, HQ1_img2)
+    color_vector1 = calculateBlockVector(image, 0, 0, WQ1_img, HQ1_img)
 
-    block1 += calculateBlockSimilarity(image1, image2,
-                                       WQ3_img1, 0, width1, HQ1_img1,
-                                       WQ3_img2, 0, width2, HQ1_img2)
+    color_vector3 = calculateBlockVector(image, WQ3_img, 0, width1, HQ1_img)
 
-    block1 += calculateBlockSimilarity(image1, image2,
-                                       0, HQ3_img1, WQ1_img1, height1,
-                                       0, HQ3_img2, WQ1_img2, height2)
+    color_vector7 = calculateBlockVector(image, 0, HQ3_img, WQ1_img, height1)
 
-    block1 += calculateBlockSimilarity(image1, image2,
-                                       WQ3_img1, HQ3_img1, width1, height1,
-                                       WQ3_img2, HQ3_img2, width2, height2)
+    color_vector9 = calculateBlockVector(image, WQ3_img, HQ3_img, width1, height1)
+
 
     # Blocks 2, 4, 6, and 8 (edges)
-    block2 = calculateBlockSimilarity(image1, image2,
-                                      WQ1_img1, 0, WQ3_img1, HQ1_img1,
-                                      WQ1_img2, 0, WQ3_img2, HQ1_img2)
+    color_vector2 = calculateBlockVector(image, WQ1_img, 0, WQ3_img, HQ1_img)
 
-    block2 += calculateBlockSimilarity(image1, image2,
-                                       WQ1_img1, HQ3_img1, WQ3_img1, height1,
-                                       WQ1_img2, HQ3_img2, WQ3_img2, height2)
+    color_vector4 = calculateBlockVector(image, WQ1_img, HQ3_img, WQ3_img, height1)
 
-    block2 += calculateBlockSimilarity(image1, image2,
-                                       0, HQ1_img1, WQ1_img1, HQ3_img1,
-                                       0, HQ1_img2, WQ1_img2, HQ3_img2)
+    color_vector6 = calculateBlockVector(image, 0, HQ1_img, WQ1_img, HQ3_img)
 
-    block2 += calculateBlockSimilarity(image1, image2,
-                                       WQ3_img1, HQ1_img1, width1, HQ3_img1,
-                                       WQ3_img2, HQ1_img2, width2, HQ3_img2)
+    color_vector8 = calculateBlockVector(image, WQ3_img, HQ1_img, width1, HQ3_img)
 
     # Block 5 (middle)
-    block3 = calculateBlockSimilarity(image1, image2,
-                                      WQ1_img1, HQ1_img1, WQ3_img1, HQ3_img1,
-                                      WQ1_img2, HQ1_img2, WQ3_img2, HQ3_img2)
+    color_vector5 = calculateBlockVector(image, WQ1_img, HQ1_img, WQ3_img, HQ3_img)
 
-    #  4            4               1
-    result = (block1) + (block2 * 2) + (block3 * 8)
-    # print("Block 1 =",block1 / 4)
-    # print("Block 2 =",block2 / 8)
-    # print("Block 3 =",block3)
-    return (result / 20)
+    hash_val = custom_hash(abspath_image = path_img1)
+    # print("\n\n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n")
+    # print(hash_val)
+    # print("\n\n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n")
+
+    return append_hash_and_9arrays(data, hash_val,
+                                   color_vector1,
+                                   color_vector2,
+                                   color_vector3,
+                                   color_vector4,
+                                   color_vector5,
+                                   color_vector6,
+                                   color_vector7,
+                                   color_vector8,
+                                   color_vector9)
+
+
+def dotProduct(color_vector1 : list[float], color_vector2 : list[float]) -> float:
+
+    result = 0
+    for i in range(36):
+        result += (color_vector1[i] * color_vector2[i])
+
+    return result
+
+
+def similarityColor(path_img1 : str, path_img2 : str) -> float:
+
+    data = get_cache()
+    print(data)
+
+    idx1 = get_index_by_abspath_image(data, path_img1)
+    if (idx1 == -1):
+        data = writeImageBlockVectors(data, path_img1)
+        idx1 = get_index_by_abspath_image(data, path_img1)
+
+
+    idx2 = get_index_by_abspath_image(data, path_img2)
+    if (idx2 == -1):
+        data = writeImageBlockVectors(data, path_img2)
+        idx2 = get_index_by_abspath_image(data, path_img2)
+
+    similarity = 0
+
+    for i in range(9):
+        color_vector1 = data[idx1]['attribute'][f"array_{i+1}"]
+        color_vector2 = data[idx2]['attribute'][f"array_{i+1}"]
+
+        block_similarity = dotProduct(color_vector1, color_vector2)
+
+        if (i+1) in [1,3,7,9]:
+            similarity += block_similarity
+
+        elif (i+1) in [2,4,6,8]:
+            similarity += (2 * block_similarity)
+
+        else:
+            similarity += (9 * block_similarity)
+        
+    similarity /= 21
+    update_database(data)
+
+    return similarity
