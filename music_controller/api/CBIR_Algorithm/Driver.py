@@ -17,6 +17,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     result_dataset_files = list()
 
     def inside_loop(i: int, query_img: Image):
+        print(f"start: {i}")
         if (not isTexture):
             val = similarityColor(query_img, dataset_images[i])  # Mode warna
         else:
@@ -25,6 +26,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         if val >= 0.6:
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
+        print(f"end: {i}")
 
     # for i in range(len(dataset_files)):
     #     inside_loop(i)

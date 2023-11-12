@@ -218,6 +218,14 @@ class ImageUploadView(APIView):
 
         # Save the dataset images to the local folder
 
+        dataset_folder_path = os.path.join(
+            settings.MEDIA_ROOT, 'dataset_images')
+        for existing_image_name in os.listdir(dataset_folder_path):
+            existing_image_path = os.path.join(
+                dataset_folder_path, existing_image_name)
+            os.remove(existing_image_path)
+            print(f"Existing dataset image deleted: {existing_image_path}")
+
         for i in range(len(request.FILES)-1):
             dataset_image = request.FILES.get(f'dataset[{i}]')
             if dataset_image:
