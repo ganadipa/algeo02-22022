@@ -123,6 +123,7 @@ def get_index(data, hash):
     hi = len(data)-1
     while (lo <= hi):
         mid = (hi + lo)//2
+
         if (hash == data[mid]['hash']):
             return mid
         elif (hash > data[mid]['hash']):
@@ -142,6 +143,8 @@ def get_index_by_abspath_image(data, abspath):
     hi = len(data)-1
     while (lo <= hi):
         mid = (hi + lo)//2
+        print(hash_value)
+        print(data[mid]['hash'])
         if (hash_value == data[mid]['hash']):
             return mid
         elif (hash_value > data[mid]['hash']):
@@ -212,8 +215,8 @@ def get_cache():
     with open(p+"cached_image.csv", 'r') as f:
         csv_reader = csv.reader(f, delimiter=',')
         for row in csv_reader:
-            tmp = {"hash": row, 'attribute': {'array_1': [], 'array_2': [], 'array_3': [], 'array_4': [], 'array_5': [], 'array_6': [], 'array_7': [], 'array_8': [], 'array_9': []
-                                              }}
+            tmp = {"hash": row[0], 'attribute': {'array_1': [], 'array_2': [], 'array_3': [], 'array_4': [], 'array_5': [], 'array_6': [], 'array_7': [], 'array_8': [], 'array_9': []
+                                                 }}
             data.append(tmp)
 
     with open(p+"array1.csv", 'r') as f:
@@ -223,7 +226,7 @@ def get_cache():
             data[i]['attribute']['array_1'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_1'][j] = int(value)
+                data[i]['attribute']['array_1'][j] = float(value)
                 j += 1
 
             i += 1
@@ -235,7 +238,7 @@ def get_cache():
             data[i]['attribute']['array_2'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_2'][j] = int(value)
+                data[i]['attribute']['array_2'][j] = float(value)
                 j += 1
 
             i += 1
@@ -247,7 +250,7 @@ def get_cache():
             data[i]['attribute']['array_3'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_3'][j] = int(value)
+                data[i]['attribute']['array_3'][j] = float(value)
                 j += 1
 
             i += 1
@@ -259,7 +262,7 @@ def get_cache():
             data[i]['attribute']['array_4'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_4'][j] = int(value)
+                data[i]['attribute']['array_4'][j] = float(value)
                 j += 1
 
             i += 1
@@ -271,7 +274,7 @@ def get_cache():
             data[i]['attribute']['array_5'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_5'][j] = int(value)
+                data[i]['attribute']['array_5'][j] = float(value)
                 j += 1
 
             i += 1
@@ -283,7 +286,7 @@ def get_cache():
             data[i]['attribute']['array_6'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_6'][j] = int(value)
+                data[i]['attribute']['array_6'][j] = float(value)
                 j += 1
 
             i += 1
@@ -295,7 +298,7 @@ def get_cache():
             data[i]['attribute']['array_7'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_7'][j] = int(value)
+                data[i]['attribute']['array_7'][j] = float(value)
                 j += 1
 
             i += 1
@@ -307,7 +310,7 @@ def get_cache():
             data[i]['attribute']['array_8'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_8'][j] = int(value)
+                data[i]['attribute']['array_8'][j] = float(value)
                 j += 1
 
             i += 1
@@ -319,7 +322,7 @@ def get_cache():
             data[i]['attribute']['array_9'] = [0 for i in range(36)]
             j = 0
             for value in row:
-                data[i]['attribute']['array_9'][j] = int(value)
+                data[i]['attribute']['array_9'][j] = float(value)
                 j += 1
 
             i += 1
@@ -377,6 +380,7 @@ if __name__ == '__main__':
     start = time.time()
     get_cache()
     print(time.time() - start)  # 1.3640406131744385
+    print(get_cache())
 
     # new = append_hash_and_9arrays(
     #     example, "hehe", [], [], [], [], [], [], [], [], [])

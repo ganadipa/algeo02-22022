@@ -1,2 +1,1 @@
-se(example)
-    get_cache()
+example

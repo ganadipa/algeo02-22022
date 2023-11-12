@@ -264,7 +264,6 @@ def calculateBlockVector(image1: Image, start_x, start_y, end_x, end_y) -> list[
 
     # Di sini kita "increment sorrounding colors by weight"
 
-
     # Create 36 feature vector
     color_vector = []
 
@@ -283,7 +282,8 @@ def calculateBlockVector(image1: Image, start_x, start_y, end_x, end_y) -> list[
     return color_vector
 
 
-def writeImageBlockVectors(data, path_img1): # RETURNS NEW DATA AFTER WRITING NEW IMG'S DATUM
+# RETURNS NEW DATA AFTER WRITING NEW IMG'S DATUM
+def writeImageBlockVectors(data, path_img1):
 
     image = Image.open(path_img1)
     width1, height1 = image.size
@@ -306,22 +306,25 @@ def writeImageBlockVectors(data, path_img1): # RETURNS NEW DATA AFTER WRITING NE
 
     color_vector7 = calculateBlockVector(image, 0, HQ3_img, WQ1_img, height1)
 
-    color_vector9 = calculateBlockVector(image, WQ3_img, HQ3_img, width1, height1)
-
+    color_vector9 = calculateBlockVector(
+        image, WQ3_img, HQ3_img, width1, height1)
 
     # Blocks 2, 4, 6, and 8 (edges)
     color_vector2 = calculateBlockVector(image, WQ1_img, 0, WQ3_img, HQ1_img)
 
-    color_vector4 = calculateBlockVector(image, WQ1_img, HQ3_img, WQ3_img, height1)
+    color_vector4 = calculateBlockVector(
+        image, WQ1_img, HQ3_img, WQ3_img, height1)
 
     color_vector6 = calculateBlockVector(image, 0, HQ1_img, WQ1_img, HQ3_img)
 
-    color_vector8 = calculateBlockVector(image, WQ3_img, HQ1_img, width1, HQ3_img)
+    color_vector8 = calculateBlockVector(
+        image, WQ3_img, HQ1_img, width1, HQ3_img)
 
     # Block 5 (middle)
-    color_vector5 = calculateBlockVector(image, WQ1_img, HQ1_img, WQ3_img, HQ3_img)
+    color_vector5 = calculateBlockVector(
+        image, WQ1_img, HQ1_img, WQ3_img, HQ3_img)
 
-    hash_val = custom_hash(abspath_image = path_img1)
+    hash_val = custom_hash(abspath_image=path_img1)
     # print("\n\n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n")
     # print(hash_val)
     # print("\n\n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n")
@@ -338,7 +341,7 @@ def writeImageBlockVectors(data, path_img1): # RETURNS NEW DATA AFTER WRITING NE
                                    color_vector9)
 
 
-def dotProduct(color_vector1 : list[float], color_vector2 : list[float]) -> float:
+def dotProduct(color_vector1: list[float], color_vector2: list[float]) -> float:
 
     result = 0
     for i in range(36):
@@ -347,16 +350,14 @@ def dotProduct(color_vector1 : list[float], color_vector2 : list[float]) -> floa
     return result
 
 
-def similarityColor(path_img1 : str, path_img2 : str) -> float:
+def similarityColor(path_img1: str, path_img2: str) -> float:
 
     data = get_cache()
-    print(data)
 
     idx1 = get_index_by_abspath_image(data, path_img1)
     if (idx1 == -1):
         data = writeImageBlockVectors(data, path_img1)
         idx1 = get_index_by_abspath_image(data, path_img1)
-
 
     idx2 = get_index_by_abspath_image(data, path_img2)
     if (idx2 == -1):
@@ -371,15 +372,15 @@ def similarityColor(path_img1 : str, path_img2 : str) -> float:
 
         block_similarity = dotProduct(color_vector1, color_vector2)
 
-        if (i+1) in [1,3,7,9]:
+        if (i+1) in [1, 3, 7, 9]:
             similarity += block_similarity
 
-        elif (i+1) in [2,4,6,8]:
+        elif (i+1) in [2, 4, 6, 8]:
             similarity += (2 * block_similarity)
 
         else:
             similarity += (9 * block_similarity)
-        
+
     similarity /= 21
     update_database(data)
 
