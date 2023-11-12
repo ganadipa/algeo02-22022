@@ -3,6 +3,7 @@ from api.CBIR_Algorithm.CBIR_Texture import *
 from api.CBIR_Algorithm.fileLoader import *
 import time
 import os
+from api.CBIR_Algorithm.CustomThreading import CustomThread
 
 
 def getSimiliarity(query, isTexture):
@@ -13,17 +14,65 @@ def getSimiliarity(query, isTexture):
     start = time.time()
     similarity_values = []
 
-    result_dataset_files = list() # ```revisi aldy -> bikin list baru buat result files nya
-    for i in range(len(dataset_files)):
+    # ```revisi aldy -> bikin list baru buat result files nya
+    result_dataset_files = list()
 
+    def inside_loop(i: int):
+        print(f"starting i: {i}")
         if (not isTexture):
             val = similarityColor(query_img, dataset_images[i])  # Mode warna
         else:
-            val = similarityTexture(query_img, dataset_images[i])  # Mode tekstur
+            val = similarityTexture(
+                query_img, dataset_images[i])  # Mode tekstur
         if val >= 0.6:
             similarity_values.append(val)
-            result_dataset_files.append(dataset_files[i]) # ```revisi aldy
-            
+            result_dataset_files.append(dataset_files[i])  # ```revisi aldy
+        print(f"ending i: {i}")
+
+    # multithreading
+    i = [0]
+    length_dataset: int = len(dataset_files)
+
+    def thread_workload():
+        while i[0] < length_dataset:
+            t = CustomThread(target=inside_loop, args=(i[0],))
+            t.start()
+            i[0] += 1
+            t.join()
+
+    NUM_THREAD = 8
+    for j in range(NUM_THREAD):
+        thread_workload()
+
+    # for i in range(0, length_dataset, 5):
+    #     t1 = CustomThread(target=inside_loop, args=(i,))
+    #     t1.start()
+
+    #     if (i+1 < length_dataset):
+    #         t2 = CustomThread(target=inside_loop, args=(i+1,))
+    #         t2.start()
+
+    #     if (i+2 < length_dataset):
+    #         t3 = CustomThread(target=inside_loop, args=(i+2,))
+    #         t3.start()
+
+    #     if (i+3 < length_dataset):
+    #         t4 = CustomThread(target=inside_loop, args=(i+3,))
+    #         t4.start()
+
+    #     if (i+4 < length_dataset):
+    #         t5 = CustomThread(target=inside_loop, args=(i+4,))
+    #         t5.start()
+
+    #     t1.join()
+    #     if (i+1 < length_dataset):
+    #         t2.join()
+    #     if (i+2 < length_dataset):
+    #         t3.join()
+    #     if (i+3 < length_dataset):
+    #         t4.join()
+    #     if (i+4 < length_dataset):
+    #         t5.join()
 
     # dataset_files = dataset_files[:len(similarity_values)] # gak gini gan -Aldy
     for i in range(len(result_dataset_files)):

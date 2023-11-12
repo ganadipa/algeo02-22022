@@ -2,8 +2,10 @@ from PIL import Image
 import os
 
 """ Biar gk rusak """
-# Saya pun tidak tahu kenapa, tetapi kemarin saya coba img nya kalau ngga diginiin dulu 
+# Saya pun tidak tahu kenapa, tetapi kemarin saya coba img nya kalau ngga diginiin dulu
 # programnya gak mau run jadi yasudah. -Aldy
+
+
 def biarGakRusak(img: Image):
     return img.convert('RGB')
 
@@ -14,6 +16,8 @@ def biarGakRusak(img: Image):
 # Total ada 4 + 16*2 = 36 possible warna
 
 # RGB to HSV. Mengembalikan three tuple (h,s,v) untuk sebuah RGB
+
+
 def RGBtoHSV(R: int, G: int, B: int) -> (int, int, int):
     R = float(R / 255)
     G = float(G / 255)
@@ -23,7 +27,9 @@ def RGBtoHSV(R: int, G: int, B: int) -> (int, int, int):
     CMin = min([R, G, B])
     delta = CMax - CMin
 
-    hue = 'Okusawa'; saturation = 'Misaki'; value = 'Waifu Terbaik' # Deklarasi :D
+    hue = 'Okusawa'
+    saturation = 'Misaki'
+    value = 'Waifu Terbaik'  # Deklarasi :D
 
     # Value for hue
     if delta == 0:
@@ -32,7 +38,7 @@ def RGBtoHSV(R: int, G: int, B: int) -> (int, int, int):
         hue = 60 * mod6((G - B) / delta)
     elif CMax == G:
         hue = 60 * (2 + (B - R) / delta)
-    else: # CMax == B
+    else:  # CMax == B
         hue = 60 * (4 + (R - G) / delta)
 
     # Value for saturation
@@ -47,7 +53,9 @@ def RGBtoHSV(R: int, G: int, B: int) -> (int, int, int):
     return (hue, saturation, value)
 
 # Define quantify hue to color (belum dibagi jadi gelap terang)
-def HueToColor(h : int) -> str:
+
+
+def HueToColor(h: int) -> str:
 
     if ((0 <= h <= 10) or (355 <= h <= 369)):
         return "Red"
@@ -81,9 +89,11 @@ def HueToColor(h : int) -> str:
         return "Pink"
     elif 346 <= h <= 355:
         return "PinkRed"
-    
+
 # Defined for when saturation is 0 or greyscale
-def GreyScaleColor(v : int) -> str:
+
+
+def GreyScaleColor(v: int) -> str:
     if (v < 0.2):
         return "Black"
     elif (0.2 <= v < 0.5):
@@ -96,52 +106,79 @@ def GreyScaleColor(v : int) -> str:
         print("Uh oh, what happened here???")
 
 # Mengembalikan indeks atau bin untuk sebuah warna tertentu.
-def ColorToIndex(color : str) -> int:
-    if color == "Red":              return 0
-    if color == "RedOrange":        return 1
-    if color == "OrangeBrown":      return 2
-    if color == "OrangeYellow":     return 3
-    if color == "Yellow":           return 4
-    if color == "YellowGreen":      return 5
-    if color == "Green":            return 6
-    if color == "GreenCyan":        return 7
-    if color == "Cyan":             return 8
-    if color == "CyanBlue":         return 9
-    if color == "Blue":             return 10
-    if color == "BlueMagenta":      return 11
-    if color == "Magenta":          return 12
-    if color == "MagentaMink":      return 13
-    if color == "Pink":             return 14
-    if color == "PinkRed":          return 15
 
-    if color == "Black":            return 0
-    if color == "DarkGray":         return 1
-    if color == "LightGray":        return 2
-    if color == "White":            return 3
+
+def ColorToIndex(color: str) -> int:
+    if color == "Red":
+        return 0
+    if color == "RedOrange":
+        return 1
+    if color == "OrangeBrown":
+        return 2
+    if color == "OrangeYellow":
+        return 3
+    if color == "Yellow":
+        return 4
+    if color == "YellowGreen":
+        return 5
+    if color == "Green":
+        return 6
+    if color == "GreenCyan":
+        return 7
+    if color == "Cyan":
+        return 8
+    if color == "CyanBlue":
+        return 9
+    if color == "Blue":
+        return 10
+    if color == "BlueMagenta":
+        return 11
+    if color == "Magenta":
+        return 12
+    if color == "MagentaMink":
+        return 13
+    if color == "Pink":
+        return 14
+    if color == "PinkRed":
+        return 15
+
+    if color == "Black":
+        return 0
+    if color == "DarkGray":
+        return 1
+    if color == "LightGray":
+        return 2
+    if color == "White":
+        return 3
 
 # Define HSV to Index
-def HSVToIndex(h: int, s : int, v : int) -> int:
+
+
+def HSVToIndex(h: int, s: int, v: int) -> int:
     color = ''
-    
+
     if s < 0.15:
         color = GreyScaleColor(v)
     else:
         color = HueToColor(h)
-    
+
     return ColorToIndex(color)
 
-# Ultimately, this is what we will use 
+# Ultimately, this is what we will use
 #####   Define RGB to Index   #####
-def RGBToIndex(r: int, g: int, b: int) -> int:
-    h,s,v = RGBtoHSV(r, g, b)
-    return HSVToIndex(int(h), s, v)
 
+
+def RGBToIndex(r: int, g: int, b: int) -> int:
+    h, s, v = RGBtoHSV(r, g, b)
+    return HSVToIndex(int(h), s, v)
 
 
 """ Utility Functions """
 # Normalize vector
 # Recieves a vector in the form of a list and returns a normalized version of the vector
-def normalize(vector : list[float]) -> list[float]:
+
+
+def normalize(vector: list[float]) -> list[float]:
     vectorLength = 0
 
     for i in range(len(vector)):
@@ -151,30 +188,37 @@ def normalize(vector : list[float]) -> list[float]:
 
     for i in range(len(vector)):
         vector[i] /= vectorLength
-    
+
     return vector
 
-# Define mod 6 for RGB to HSV function: 
+# Define mod 6 for RGB to HSV function:
 # if n is -6 < n < 0, then we want to use n + 6 instead
-def mod6(n : float) -> float:
+
+
+def mod6(n: float) -> float:
     return n if n > 0 else (n + 6)
 
 # Newton SQRT biar keren (cuman nambah ~100an operasi, it's fine...)
+
+
 def NewtonSqrt(num: float):
 
-    result = num/2 # initial guess
+    result = num/2  # initial guess
     for i in range(30):
-        result = result - ( ( ( result * result ) - num ) / ( 2 * result ) )
-    
+        result = result - (((result * result) - num) / (2 * result))
+
     return result
+
 
 """ Calculation Functions """
 # Single block Cosine Similarity
 # Obviously, pra kondisi: dimensi image harus lebih besar dari dimensi start/end dari block
-def calculateBlockSimilarity(image1 : Image, image2 : Image, 
-                        start_x1, start_y1, end_x1, end_y1,
-                        start_x2, start_y2, end_x2, end_y2) -> float:
-    
+
+
+def calculateBlockSimilarity(image1: Image, image2: Image,
+                             start_x1, start_y1, end_x1, end_y1,
+                             start_x2, start_y2, end_x2, end_y2) -> float:
+
     # Load stuff
     image1 = biarGakRusak(image1)
     image2 = biarGakRusak(image2)
@@ -194,18 +238,20 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
     for y in range(start_y1, end_y1 - compression_y, compression_y):
         for x in range(start_x1, end_x1 - compression_x, compression_x):
 
-            r,g,b = pixels1[x, y]           # Access pixel color and allocate to {r,g,b}
-            h,s,v = RGBtoHSV(r, g, b)
-            idx = HSVToIndex(int(h), s, v)       # Get color code for that particular RGB
-            
+            # Access pixel color and allocate to {r,g,b}
+            r, g, b = pixels1[x, y]
+            h, s, v = RGBtoHSV(r, g, b)
+            # Get color code for that particular RGB
+            idx = HSVToIndex(int(h), s, v)
+
             if s < 0.15:                          # Increment frequency of that color by +1
-                GreyScaleColors1[idx] += 1 
+                GreyScaleColors1[idx] += 1
                 if idx == 1 or idx == 2:
                     GreyScaleColors1[idx-1] += 0.19628
                     GreyScaleColors1[idx+1] += 0.19628
             else:
                 if v > 0.7:
-                    LightColors1[idx] += 1 
+                    LightColors1[idx] += 1
                     LightColors1[(idx - 1) % 16] += 0.499
                     LightColors1[(idx + 1) % 16] += 0.499
                     DarkColors1[idx] += 0.5
@@ -221,7 +267,6 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
 
     # Di sini kita "increment sorrounding colors by weight"
 
-
     # Calculate HSV Histogram / freq table for image 2
     # Process is the same as image 1
     LightColors2 = [0 for i in range(16)]
@@ -231,8 +276,8 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
     for y in range(start_y2, end_y2 - compression_y, compression_y):
         for x in range(start_x2, end_x2 - compression_x, compression_x):
 
-            r,g,b = pixels2[x, y]
-            h,s,v = RGBtoHSV(r, g, b)
+            r, g, b = pixels2[x, y]
+            h, s, v = RGBtoHSV(r, g, b)
             idx = HSVToIndex(int(h), s, v)
 
             if s < 0.15:
@@ -242,7 +287,7 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
                     GreyScaleColors2[idx+1] += 0.19628
             else:
                 if v > 0.7:
-                    LightColors2[idx] += 1 
+                    LightColors2[idx] += 1
                     LightColors2[(idx - 1) % 16] += 0.499
                     LightColors2[(idx + 1) % 16] += 0.499
                     DarkColors2[idx] += 0.5
@@ -253,7 +298,7 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
                     DarkColors2[(idx - 1) % 16] += 0.499
                     DarkColors2[(idx + 1) % 16] += 0.499
                     LightColors2[idx] += 0.5
-                    LightColors2[(idx - 1) % 16] += 0.2499 
+                    LightColors2[(idx - 1) % 16] += 0.2499
                     LightColors2[(idx + 1) % 16] += 0.2499
 
     # Create 36 feature vector
@@ -300,7 +345,6 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
     return dot_product
 
 
-
 # COLOR SIMILARITY MAIN FUNCTION
 # The main function: Calculate similarity for each 3x3 block and multiply them with
 # their respective weight
@@ -310,7 +354,7 @@ def calculateBlockSimilarity(image1 : Image, image2 : Image,
 # 4 5 5 6
 # 7 8 8 9
 
-def similarityColor(image1 : Image, image2 : Image) -> float:
+def similarityColor(image1: Image, image2: Image) -> float:
     width1, height1 = image1.size
     width2, height2 = image2.size
 
@@ -331,46 +375,45 @@ def similarityColor(image1 : Image, image2 : Image) -> float:
 
     result = 0
     # Blocks 1, 3, 7, and 9 (corners)
-    block1 = calculateBlockSimilarity(image1, image2, 
-                                       0, 0, WQ1_img1, HQ1_img1,
-                                       0, 0, WQ1_img2, HQ1_img2)
-    
-    block1 += calculateBlockSimilarity(image1, image2, 
+    block1 = calculateBlockSimilarity(image1, image2,
+                                      0, 0, WQ1_img1, HQ1_img1,
+                                      0, 0, WQ1_img2, HQ1_img2)
+
+    block1 += calculateBlockSimilarity(image1, image2,
                                        WQ3_img1, 0, width1, HQ1_img1,
                                        WQ3_img2, 0, width2, HQ1_img2)
 
-    block1 += calculateBlockSimilarity(image1, image2, 
+    block1 += calculateBlockSimilarity(image1, image2,
                                        0, HQ3_img1, WQ1_img1, height1,
                                        0, HQ3_img2, WQ1_img2, height2)
-    
-    block1 += calculateBlockSimilarity(image1, image2, 
+
+    block1 += calculateBlockSimilarity(image1, image2,
                                        WQ3_img1, HQ3_img1, width1, height1,
                                        WQ3_img2, HQ3_img2, width2, height2)
 
-    
     # Blocks 2, 4, 6, and 8 (edges)
-    block2 = calculateBlockSimilarity(image1, image2, 
-                                       WQ1_img1, 0, WQ3_img1, HQ1_img1,
-                                       WQ1_img2, 0, WQ3_img2, HQ1_img2)
-    
-    block2 += calculateBlockSimilarity(image1, image2, 
+    block2 = calculateBlockSimilarity(image1, image2,
+                                      WQ1_img1, 0, WQ3_img1, HQ1_img1,
+                                      WQ1_img2, 0, WQ3_img2, HQ1_img2)
+
+    block2 += calculateBlockSimilarity(image1, image2,
                                        WQ1_img1, HQ3_img1, WQ3_img1, height1,
                                        WQ1_img2, HQ3_img2, WQ3_img2, height2)
 
-    block2 += calculateBlockSimilarity(image1, image2, 
+    block2 += calculateBlockSimilarity(image1, image2,
                                        0, HQ1_img1, WQ1_img1, HQ3_img1,
                                        0, HQ1_img2, WQ1_img2, HQ3_img2)
-    
-    block2 += calculateBlockSimilarity(image1, image2, 
+
+    block2 += calculateBlockSimilarity(image1, image2,
                                        WQ3_img1, HQ1_img1, width1, HQ3_img1,
                                        WQ3_img2, HQ1_img2, width2, HQ3_img2)
-    
+
     # Block 5 (middle)
-    block3 = calculateBlockSimilarity(image1, image2, 
-                                       WQ1_img1, HQ1_img1, WQ3_img1, HQ3_img1,
-                                       WQ1_img2, HQ1_img2, WQ3_img2, HQ3_img2)
-    
-            #  4            4               1
+    block3 = calculateBlockSimilarity(image1, image2,
+                                      WQ1_img1, HQ1_img1, WQ3_img1, HQ3_img1,
+                                      WQ1_img2, HQ1_img2, WQ3_img2, HQ3_img2)
+
+    #  4            4               1
     result = (block1) + (block2 * 2) + (block3 * 8)
     # print("Block 1 =",block1 / 4)
     # print("Block 2 =",block2 / 8)

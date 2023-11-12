@@ -179,6 +179,7 @@ const Main = ({ searchParams }: MainPageProps) => {
               setSelectedImage={setSelectedImage}
               setSearchResult={setSearchResult}
               searchResult={searchResult}
+              setNumpage={setNumpage}
             />
           </div>
         </section>
@@ -218,13 +219,6 @@ const Main = ({ searchParams }: MainPageProps) => {
                         </span>
                       </div>
                     </>
-
-                    {showResultLoading[ind] ? null : (
-                      <SkeletonLoading
-                        className="h-full w-full animate-pulse"
-                        color="bg-gray-300"
-                      />
-                    )}
                   </div>
                 );
               })}

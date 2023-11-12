@@ -28,6 +28,7 @@ type FileUploadType = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchResult: React.Dispatch<searchResultType>;
   searchResult: searchResultType;
+  setNumpage: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const FileUpload = ({
@@ -35,6 +36,7 @@ const FileUpload = ({
   setLoading,
   setSearchResult,
   searchResult,
+  setNumpage,
 }: FileUploadType) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const datasetInputRef = useRef<HTMLInputElement | null>(null);
@@ -57,6 +59,7 @@ const FileUpload = ({
 
   async function handleSubmit(isColor: boolean) {
     try {
+      setNumpage(1);
       const toastLoadingId = toast.loading("Searching...");
       const dataset = datasetInputRef.current?.files;
       const query = fileInputRef.current?.files;
