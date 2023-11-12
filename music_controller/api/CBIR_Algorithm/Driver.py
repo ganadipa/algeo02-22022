@@ -26,10 +26,10 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
         print(f"end: {i}")
     
-    def inside_loopColor(i: int, querySomething : Image):
+    def inside_loopColor(i: int, querySomething : str):
         print(f"start: {i}")
 
-        val = similarityColor(querySomething, dataset_images[i])
+        val = similarityColor(querySomething, dataset_files[i])
         
         if val >= 0.6:
             similarity_values.append(val)
@@ -69,7 +69,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
                          args=(k, query_CHEvector))
         else:
             t = CustomThread(target=thread_workload,
-                         args=(k, queryImg))
+                         args=(k, query))
         t.start()
         threads[k] = t
 
