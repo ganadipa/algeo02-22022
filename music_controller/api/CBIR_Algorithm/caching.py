@@ -355,7 +355,51 @@ def get_cache():
     print(data)
 
 
+def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, array5, array6, array7, array8, array9):
+    tmp = {
+        'hash': hash_val,
+        'attribute': {
+            'array_1': array1,
+            'array_2': array2,
+            'array_3': array3,
+            'array_4': array4,
+            'array_5': array5,
+            'array_6': array6,
+            'array_7': array7,
+            'array_8': array8,
+            'array_9': array9,
+
+        }
+    }
+    old_length = len(data)
+    new_data = [0 for i in range(len(data) + 1)]
+
+    # binary search to get the position
+    lo = 0
+    hi = old_length
+
+    while (lo < hi):
+        mid = (hi + lo)//2
+        if (data[mid]['hash'] > hash_val):
+            hi = mid
+        else:
+            lo = mid + 1
+
+    for i in range(lo):
+        new_data[i] = data[i]
+    new_data[lo] = tmp
+    for i in range(lo+1, old_length+1):
+        new_data[i] = data[i-1]
+
+    return new_data
+
+
 if __name__ == '__main__':
     root = os.path.abspath(".") + '\\'
     update_database(example)
-    get_cache()
+
+    new = append_hash_and_9arrays(
+        example, "hehe", [], [], [], [], [], [], [], [], [])
+    newagain = append_hash_and_9arrays(
+        new, "1hehe", [], [], [], [], [], [], [], [], [])
+    print(newagain)
