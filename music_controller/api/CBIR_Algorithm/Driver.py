@@ -7,6 +7,8 @@ from api.CBIR_Algorithm.CustomThreading import CustomThread
 
 
 def getSimiliarity(query, isTexture, NUM_THREAD):
+    cache = get_cache()
+
     parent = os.path.abspath("./") + '\\public\\'
     dataset_files = loadFolder(parent + "\\dataset_images\\")
     dataset_images = loadImages(dataset_files)
@@ -16,7 +18,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     # ```revisi aldy -> bikin list baru buat result files nya
     result_dataset_files = list()
 
-    def inside_loopTexture(i: int, querySomething : list[float]):
+    def inside_loopTexture(i: int, querySomething: list[float]):
         print(f"start: {i}")
 
         val = similarityTextureV2(
@@ -25,17 +27,16 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
         print(f"end: {i}")
-    
-    def inside_loopColor(i: int, querySomething : str):
+
+    def inside_loopColor(i: int, querySomething: str):
         print(f"start: {i}")
 
-        val = similarityColor(querySomething, dataset_files[i])
-        
+        val = similarityColor(querySomething, dataset_files[i], cache)
+
         if val >= 0.6:
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])
-            
-        
+
     # for i in range(len(dataset_files)):
     #     inside_loop(i)
     i = [-1]
@@ -50,7 +51,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
                 i[0] += 1
                 inside_loopTexture(i[0], querySomething)
                 load[label] += 1
-                
+
         else:
             while i[0]+1 < length_dataset:
                 i[0] += 1
@@ -60,23 +61,22 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     # make queryImg as a file in uploaded_images folder
     queryImg = Image.open(query)
     query_GLCM = CalculateGLCMMatrix(queryImg)
-    query_contrast, query_homogeneity, query_entropy = calculateFeatures(query_GLCM)
+    query_contrast, query_homogeneity, query_entropy = calculateFeatures(
+        query_GLCM)
     query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
-    
+
     for k in range(NUM_THREAD):
-        if(isTexture):
+        if (isTexture):
             t = CustomThread(target=thread_workload,
-                         args=(k, query_CHEvector))
+                             args=(k, query_CHEvector))
         else:
             t = CustomThread(target=thread_workload,
-                         args=(k, query))
+                             args=(k, query))
         t.start()
         threads[k] = t
 
     for k in range(NUM_THREAD):
         threads[k].join()
-
-    print(load)
 
     # for i in range(0, length_dataset, 5):
     #     t1 = CustomThread(target=inside_loop, args=(i,))
@@ -109,16 +109,14 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     #         t5.join()
 
     # dataset_files = dataset_files[:len(similarity_values)] # gak gini gan -Aldy
-    
-    #SORTING
-    
+
+    # SORTING
+
     for i in range(len(result_dataset_files)):
         for j in range(len(result_dataset_files)):
             if similarity_values[i] > similarity_values[j]:
                 similarity_values[i], similarity_values[j] = similarity_values[j], similarity_values[i]
                 result_dataset_files[i], result_dataset_files[j] = result_dataset_files[j], result_dataset_files[i]
-
-
 
     dataset_files_relative_path = [0 for i in range(len(result_dataset_files))]
     for i in range(len(result_dataset_files)):
@@ -126,14 +124,13 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         dataset_files_relative_path[i] = '/' + \
             path[len(path)-2] + '/' + path[len(path)-1]
 
-
-
     for i in range(len(result_dataset_files)):
-        if i != 0:
+        if i >= 0:
             print(f"{i}:", result_dataset_files[i], "{:.2f}".format(
                 similarity_values[i] * 100))
 
     end = time.time()
+    update_database(cache)
     return {
         "duration": end-start,
         "similiarity_arr": similarity_values,

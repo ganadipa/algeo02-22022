@@ -329,16 +329,16 @@ def writeImageBlockVectors(data, path_img1):
     # print(hash_val)
     # print("\n\n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n")
 
-    return append_hash_and_9arrays(data, hash_val,
-                                   color_vector1,
-                                   color_vector2,
-                                   color_vector3,
-                                   color_vector4,
-                                   color_vector5,
-                                   color_vector6,
-                                   color_vector7,
-                                   color_vector8,
-                                   color_vector9)
+    append_hash_and_9arrays(data, hash_val,
+                            color_vector1,
+                            color_vector2,
+                            color_vector3,
+                            color_vector4,
+                            color_vector5,
+                            color_vector6,
+                            color_vector7,
+                            color_vector8,
+                            color_vector9)
 
 
 def dotProduct(color_vector1: list[float], color_vector2: list[float]) -> float:
@@ -350,18 +350,18 @@ def dotProduct(color_vector1: list[float], color_vector2: list[float]) -> float:
     return result
 
 
-def similarityColor(path_img1: str, path_img2: str) -> float:
-
-    data = get_cache()
+def similarityColor(path_img1: str, path_img2: str, data) -> float:
 
     idx1 = get_index_by_abspath_image(data, path_img1)
+    print(path_img1, idx1)
     if (idx1 == -1):
-        data = writeImageBlockVectors(data, path_img1)
+        writeImageBlockVectors(data, path_img1)
         idx1 = get_index_by_abspath_image(data, path_img1)
 
     idx2 = get_index_by_abspath_image(data, path_img2)
+    print(path_img2, idx2)
     if (idx2 == -1):
-        data = writeImageBlockVectors(data, path_img2)
+        writeImageBlockVectors(data, path_img2)
         idx2 = get_index_by_abspath_image(data, path_img2)
 
     similarity = 0
@@ -382,6 +382,5 @@ def similarityColor(path_img1: str, path_img2: str) -> float:
             similarity += (9 * block_similarity)
 
     similarity /= 21
-    update_database(data)
 
     return similarity

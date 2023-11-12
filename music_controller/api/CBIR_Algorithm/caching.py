@@ -143,8 +143,6 @@ def get_index_by_abspath_image(data, abspath):
     hi = len(data)-1
     while (lo <= hi):
         mid = (hi + lo)//2
-        print(hash_value)
-        print(data[mid]['hash'])
         if (hash_value == data[mid]['hash']):
             return mid
         elif (hash_value > data[mid]['hash']):
@@ -271,7 +269,7 @@ def get_cache():
         csv_reader = csv.reader(f, delimiter=',')
         i = 0
         for row in csv_reader:
-            data[i]['attribute']['array_5'] = [0 for i in range(36)]
+            data[i]['attribute']['array_5'] = [0 for k in range(36)]
             j = 0
             for value in row:
                 data[i]['attribute']['array_5'][j] = float(value)
@@ -347,7 +345,6 @@ def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, arra
         }
     }
     old_length = len(data)
-    new_data = [0 for i in range(len(data) + 1)]
 
     # binary search to get the position
     lo = 0
@@ -362,28 +359,19 @@ def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, arra
         else:
             lo = mid + 1
 
-    for i in range(lo):
-        new_data[i] = data[i]
-    new_data[lo] = tmp
-    for i in range(lo+1, old_length+1):
-        new_data[i] = data[i-1]
+    data.append(tmp)
 
-    return new_data
+    for i in range(len(data)-1, lo-1, -1):
+        data[i] = data[i-1]
+    data[lo] = tmp
 
 
 if __name__ == '__main__':
     root = os.path.abspath(".") + '\\'
     dataset = root + 'public\\uploaded_images\\sunflower.jpg'
-    start = time.time()
-    update_database(example)
-    print(time.time() - start)
-    start = time.time()
-    get_cache()
-    print(time.time() - start)  # 1.3640406131744385
-    print(get_cache())
 
-    # new = append_hash_and_9arrays(
-    #     example, "hehe", [], [], [], [], [], [], [], [], [])
-    # newagain = append_hash_and_9arrays(
-    #     new, "1hehe", [], [], [], [], [], [], [], [], [])
-    # print(newagain)
+    append_hash_and_9arrays(
+        example, "hehe", [], [], [], [], [], [], [], [], [])
+    append_hash_and_9arrays(
+        example, "1hehe", [], [], [], [], [], [], [], [], [])
+    update_database(example)
