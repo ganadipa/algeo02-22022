@@ -182,7 +182,7 @@ class ImageUploadView(APIView):
         return similarities
 
     def post(self, request, format=None):
-        NUM_THREAD = 10
+        NUM_THREAD = 5
 
         # try:
 
