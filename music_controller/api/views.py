@@ -182,7 +182,7 @@ class ImageUploadView(APIView):
         return similarities
 
     def post(self, request, format=None):
-        NUM_THREAD = 10
+        NUM_THREAD = 1
 
         # try:
 
@@ -209,7 +209,6 @@ class ImageUploadView(APIView):
 
         # Save the dataset images to the local folder
 
-
         dataset_folder_path = Path(settings.MEDIA_ROOT) / 'dataset_images'
         for existing_image_path in dataset_folder_path.iterdir():
             existing_image_path.unlink()
@@ -226,11 +225,11 @@ class ImageUploadView(APIView):
                 print(f"Dataset image saved to: {dataset_image_path}")
 
         # start time
-        
+
         response = getSimiliarity(
             self.root+query_image_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
         # end time and print
- 
+
         # similarities = self.image_similarity(query_image_path, dataset_folder_path)
         # print(f"Similarities: {similarities}")
         # end time and print

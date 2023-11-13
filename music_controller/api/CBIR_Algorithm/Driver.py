@@ -29,9 +29,9 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         print(f"end: {i}")
 
     def inside_loopColor(i: int, querySomething: str):
-        print(f"start: {i}")
 
-        val = similarityColor(querySomething, dataset_files[i], cache)
+        val = similarityColor(
+            querySomething, dataset_files[i], cache)
 
         if val >= 0.6:
             similarity_values.append(val)
@@ -123,11 +123,6 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         path = result_dataset_files[i].split('\\')
         dataset_files_relative_path[i] = '/' + \
             path[len(path)-2] + '/' + path[len(path)-1]
-
-    for i in range(len(result_dataset_files)):
-        if i >= 0:
-            print(f"{i}:", result_dataset_files[i], "{:.2f}".format(
-                similarity_values[i] * 100))
 
     end = time.time()
     update_database(cache)

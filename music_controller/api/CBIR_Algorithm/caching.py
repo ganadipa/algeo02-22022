@@ -59,10 +59,43 @@ def sort_by_hash(datum_1):
     return datum_1['hash']
 
 
+def RESET_CACHE():
+    p = os.path.abspath(".\\database") + '\\'
+
+    with open(p+"cached_image.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array1.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array2.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array3.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array4.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array5.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array6.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array7.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array8.csv", 'w', newline='') as f:
+        f.truncate()
+
+    with open(p+"array9.csv", 'w', newline='') as f:
+        f.truncate()
+
+
 def update_database(data):
     p = os.path.abspath(".\\database") + '\\'
     length = len(data)
-
     data.sort(key=sort_by_hash)
 
     with open(p+"cached_image.csv", 'w', newline='') as f:
@@ -119,6 +152,9 @@ def update_database(data):
 def get_index(data, hash):
     # pastiin datanya sorted karena mau pake binary search
     # if not found return -1
+    if (len(data)) == 0:
+        return -1
+
     lo = 0
     hi = len(data)-1
     while (lo <= hi):
@@ -135,6 +171,9 @@ def get_index(data, hash):
 
 
 def get_index_by_abspath_image(data, abspath):
+    if (len(data)) == 0:
+        return -1
+
     # pastiin datanya sorted karena mau pake binary search
     # if not found return -1
     hash_value = custom_hash(abspath)
@@ -366,6 +405,11 @@ def append_hash_and_9arrays(data, hash_val, array1, array2, array3, array4, arra
     data[lo] = tmp
 
 
+def print_onlyhash(data):
+    for i in range(len(data)):
+        print(data[i]['hash'])
+
+
 if __name__ == '__main__':
     root = os.path.abspath(".") + '\\'
     dataset = root + 'public\\uploaded_images\\sunflower.jpg'
@@ -375,3 +419,4 @@ if __name__ == '__main__':
     append_hash_and_9arrays(
         example, "1hehe", [], [], [], [], [], [], [], [], [])
     update_database(example)
+    RESET_CACHE()

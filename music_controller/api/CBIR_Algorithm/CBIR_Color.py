@@ -353,22 +353,26 @@ def dotProduct(color_vector1: list[float], color_vector2: list[float]) -> float:
 def similarityColor(path_img1: str, path_img2: str, data) -> float:
 
     idx1 = get_index_by_abspath_image(data, path_img1)
-    print(path_img1, idx1)
+    # bugnya di sini i guess karena kalo lu append data baru bisa aja idx 1 berubah.
     if (idx1 == -1):
         writeImageBlockVectors(data, path_img1)
-        idx1 = get_index_by_abspath_image(data, path_img1)
+        # idx1 = get_index_by_abspath_image(data, path_img1)
 
     idx2 = get_index_by_abspath_image(data, path_img2)
-    print(path_img2, idx2)
     if (idx2 == -1):
         writeImageBlockVectors(data, path_img2)
         idx2 = get_index_by_abspath_image(data, path_img2)
 
+    idx1 = get_index_by_abspath_image(data, path_img1)
+
+    color_vectors1 = data[idx1]['attribute']
+    color_vectors2 = data[idx2]['attribute']
+
     similarity = 0
 
     for i in range(9):
-        color_vector1 = data[idx1]['attribute'][f"array_{i+1}"]
-        color_vector2 = data[idx2]['attribute'][f"array_{i+1}"]
+        color_vector1 = color_vectors1[f"array_{i+1}"]
+        color_vector2 = color_vectors2[f"array_{i+1}"]
 
         block_similarity = dotProduct(color_vector1, color_vector2)
 
