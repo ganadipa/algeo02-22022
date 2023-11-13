@@ -180,7 +180,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         dataset_files_relative_path[i] = '/' + \
             path[len(path)-2] + '/' + path[len(path)-1]
 
-    end = time.time()
+    endTime = time.time()
     update_database(cache)
     return {
         "duration": endTime-startTime,
