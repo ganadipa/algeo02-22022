@@ -1,6 +1,7 @@
 from PIL import Image
 from api.CBIR_Algorithm.caching import *
 import os
+import math
 
 """ Biar gk rusak """
 # Saya pun tidak tahu kenapa, tetapi kemarin saya coba img nya kalau ngga diginiin dulu
@@ -185,7 +186,7 @@ def normalize(vector: list[float]) -> list[float]:
     for i in range(len(vector)):
         vectorLength += (vector[i] * vector[i])
 
-    vectorLength = NewtonSqrt(vectorLength)
+    vectorLength = math.sqrt(vectorLength)
 
     for i in range(len(vector)):
         vector[i] /= vectorLength
@@ -224,8 +225,8 @@ def calculateBlockVector(image1: Image, start_x, start_y, end_x, end_y) -> list[
 
     # compression values; increase to increase spatial averaging -> higher performance with lower acc
     # (value of 1 means images are not compressed at all)
-    compression_x = 3
-    compression_y = 3
+    compression_x = math.ceil(image1.width/125)
+    compression_y = math.ceil(image1.height/125)
 
     # Calculate HSV Histogram / freq table for image 1
     LightColors = [0 for i in range(16)]
