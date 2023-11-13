@@ -39,3 +39,5 @@ next-env.d.ts
 dataset_images
 uploaded_images
 ```
+*.pyc
+*.pyc
