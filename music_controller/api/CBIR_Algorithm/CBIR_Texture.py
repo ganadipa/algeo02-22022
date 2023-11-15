@@ -7,7 +7,7 @@ import time
 """ Actual Stuff """
 # Grayscale rgb conversion
 def GrayScaleValue(R: int, G: int, B: int) -> float:
-    return int((0.29 * R + 0.587 * G + 0.114 * B))
+    return int((0.299 * R + 0.587 * G + 0.114 * B))
 
 
 # Do stuff

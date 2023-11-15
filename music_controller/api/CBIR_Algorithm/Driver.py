@@ -15,109 +15,94 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
 
     parent = os.path.abspath("./") + '\\public\\'
     dataset_files = loadFolder(parent + "\\dataset_images\\")
-    # dataset_images = loadImages(dataset_files)
+    dataset_images = loadImages(dataset_files)
     startTime = time.time()
     similarity_values = []
 
     # ```revisi aldy -> bikin list baru buat result files nya
     result_dataset_files = list()
 
-    def inside_loopTexture(i: int, img, querySomething: list[float]):
-        global next_image
-        # print(f"start: {i}")
+    if (isTexture):
+        queryImg = Image.open(query)
+        query_GLCM = CalculateGLCMMatrix(queryImg)
+        query_contrast, query_homogeneity, query_entropy = calculateFeatures(
+            query_GLCM)
+        query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
 
-        val = similarityTextureV2(
-            querySomething, img)  # Mode tekstur
-        if val >= 0.6:
-            similarity_values.append(val)
-            result_dataset_files.append(dataset_files[i])  # ```revisi aldy
-        # print(f"end: {i}")
+        for i, img in enumerate(dataset_images):
+            val = similarityTextureV2(
+                query_CHEvector, img)
+            if val >= 0.6:
+                similarity_values.append(val)
+                result_dataset_files.append(dataset_files[i])
 
-    def inside_loopColor(i: int, querySomething: str):
+    else:
+        for i, img in enumerate(dataset_images):
+            val = similarityColor(
+                query, dataset_files[i], cache)
+            if val >= 0.6:
+                similarity_values.append(val)
+                result_dataset_files.append(dataset_files[i])
 
-        val = similarityColor(
-            querySomething, dataset_files[i], cache)
+    # def inside_loopTexture(i: int, querySomething: list[float]):
+    #     print(f"start: {i}")
 
-        if val >= 0.6:
-            similarity_values.append(val)
-            result_dataset_files.append(dataset_files[i])
+    #     val = similarityTextureV2(
+    #         querySomething, dataset_images[i])  # Mode tekstur
+    #     if val >= 0.6:
+    #         similarity_values.append(val)
+    #         result_dataset_files.append(dataset_files[i])  # ```revisi aldy
+    #     print(f"end: {i}")
 
-    # for i in range(len(dataset_files)):
-    #     inside_loop(i)
-    i = [-1]
-    length_dataset: int = len(dataset_files)
+    # def inside_loopColor(i: int, querySomething: str):
 
-    def process_image(args):
-        i, image_path, querySomething, isTexture = args
-        img = Image.open(image_path)
-        if isTexture:
-            val = similarityTextureV2(querySomething, img)
-        else:
-            val = similarityColor(querySomething, img)
-        if val >= 0.6:
-            return (val, image_path)
-        else:
-            return None
+    #     val = similarityColor(
+    #         querySomething, dataset_files[i], cache)
 
-    threads = [0 for i in range(NUM_THREAD)]
-    load = [0 for i in range(NUM_THREAD)]
+    #     if val >= 0.6:
+    #         similarity_values.append(val)
+    #         result_dataset_files.append(dataset_files[i])
 
-    # # def thread_workload(label, querySomething):
-    # #     if isTexture:
-    # #         for i, img in enumerate(loadImages(dataset_files)):
-    # #             inside_loopTexture(i,img, querySomething)
-    # #             load[label] += 1
-    # #     else:
-    # #         for i, img in enumerate(loadImages(dataset_files)):
-    # #             inside_loopColor(i,img, querySomething)
-    # #             load[label] += 1
+    # # for i in range(len(dataset_files)):
+    # #     inside_loop(i)
+    # i = [-1]
+    # length_dataset: int = len(dataset_files)
 
-    # # def thread_workload(label, querySomething):
-    # #     while not image_queue.empty():
-    # #         i, image_path = image_queue.get()
-    # #         img = loadImage(image_path)
-    # #         if isTexture:
-    # #             inside_loopTexture(i, img, querySomething)
-    # #         else:
-    # #             inside_loopColor(i, img, querySomething)
-    # #         load[label] +=
-    global next_image
-    next_image = 0
-    lock = Lock()
+    # threads = [0 for i in range(NUM_THREAD)]
+    # load = [0 for i in range(NUM_THREAD)]
 
-    def thread_workload(label, querySomething):
-        global next_image
-        while True:
-            with lock:
-                if next_image >= len(dataset_files):
-                    break  # No more images to process
-                image_path = dataset_files[next_image]
-                next_image += 1
+    # def thread_workload(label, querySomething):
+    #     if isTexture:
+    #         while i[0]+1 < length_dataset:
+    #             i[0] += 1
+    #             inside_loopTexture(i[0], querySomething)
+    #             load[label] += 1
 
-            img = Image.open(image_path)
-            if isTexture:
-                inside_loopTexture(next_image, img, querySomething)
-            else:
-                inside_loopColor(next_image, img, querySomething)
-            load[label] += 1
+    #     else:
+    #         while i[0]+1 < length_dataset:
+    #             i[0] += 1
+    #             inside_loopColor(i[0], querySomething)
+    #             load[label] += 1
 
     # # make queryImg as a file in uploaded_images folder
-    queryImg = Image.open(query)
-    query_GLCM = CalculateGLCMMatrix(queryImg)
-    query_contrast, query_homogeneity, query_entropy = calculateFeatures(
-        query_GLCM)
-    query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
+    # queryImg = Image.open(query)
+    # query_GLCM = CalculateGLCMMatrix(queryImg)
+    # query_contrast, query_homogeneity, query_entropy = calculateFeatures(
+    #     query_GLCM)
+    # query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
 
-    for k in range(NUM_THREAD):
-        if (isTexture):
-            t = CustomThread(target=thread_workload,
-                             args=(k, query_CHEvector))
-        else:
-            t = CustomThread(target=thread_workload,
-                             args=(k, query))
-        t.start()
-        threads[k] = t
+    # for k in range(NUM_THREAD):
+    #     if (isTexture):
+    #         t = CustomThread(target=thread_workload,
+    #                          args=(k, query_CHEvector))
+    #     else:
+    #         t = CustomThread(target=thread_workload,
+    #                          args=(k, query))
+    #     t.start()
+    #     threads[k] = t
 
+    # for k in range(NUM_THREAD):
+    #     threads[k].join()
     # for k in range(NUM_THREAD):
     #     if(isTexture):
     #         t = Thread(target=thread_workload, args=(k, query_CHEvector))
@@ -126,11 +111,11 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     #     t.start()
     #     threads.append(t)
 
-    # for t in threads:
-    #     t.join()
+    # for k in range(NUM_THREAD):
+    #     threads[k].join()
 
-    for k in range(NUM_THREAD):
-        threads[k].join()
+    # for k in range(NUM_THREAD):
+    #     threads[k].join()
 
     # for i in range(0, length_dataset, 5):
     #     t1 = CustomThread(target=inside_loop, args=(i,))
@@ -178,7 +163,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         dataset_files_relative_path[i] = '/' + \
             path[len(path)-2] + '/' + path[len(path)-1]
 
-    end = time.time()
+    endTime = time.time()
     update_database(cache)
     return {
         "duration": end-startTime,
