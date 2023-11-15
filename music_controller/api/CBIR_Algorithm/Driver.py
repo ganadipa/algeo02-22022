@@ -8,6 +8,8 @@ from queue import Queue
 from threading import Lock
 from threading import Thread
 from multiprocessing import Pool
+
+
 def getSimiliarity(query, isTexture, NUM_THREAD):
     cache = get_cache()
 
@@ -20,7 +22,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     # ```revisi aldy -> bikin list baru buat result files nya
     result_dataset_files = list()
 
-    def inside_loopTexture(i: int,img, querySomething : list[float]):
+    def inside_loopTexture(i: int, img, querySomething: list[float]):
         global next_image
         # print(f"start: {i}")
 
@@ -30,11 +32,6 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])  # ```revisi aldy
         # print(f"end: {i}")
-    
-    def inside_loopColor(i: int,img, querySomething : Image):
-        global next_image
-        # print(f"start: {i}")
-        print(f"end: {i}")
 
     def inside_loopColor(i: int, querySomething: str):
 
@@ -44,12 +41,12 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         if val >= 0.6:
             similarity_values.append(val)
             result_dataset_files.append(dataset_files[i])
-            
-        
+
     # for i in range(len(dataset_files)):
     #     inside_loop(i)
     i = [-1]
     length_dataset: int = len(dataset_files)
+
     def process_image(args):
         i, image_path, querySomething, isTexture = args
         img = Image.open(image_path)
@@ -83,10 +80,11 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     # #             inside_loopTexture(i, img, querySomething)
     # #         else:
     # #             inside_loopColor(i, img, querySomething)
-    # #         load[label] += 
+    # #         load[label] +=
     global next_image
     next_image = 0
     lock = Lock()
+
     def thread_workload(label, querySomething):
         global next_image
         while True:
@@ -109,7 +107,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     query_contrast, query_homogeneity, query_entropy = calculateFeatures(
         query_GLCM)
     query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
-    
+
     for k in range(NUM_THREAD):
         if (isTexture):
             t = CustomThread(target=thread_workload,
@@ -127,7 +125,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     #         t = Thread(target=thread_workload, args=(k, queryImg))
     #     t.start()
     #     threads.append(t)
-            
+
     # for t in threads:
     #     t.join()
 
@@ -183,7 +181,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     end = time.time()
     update_database(cache)
     return {
-        "duration": endTime-startTime,
+        "duration": end-startTime,
         "similiarity_arr": similarity_values,
         "dataset": dataset_files_relative_path
     }
