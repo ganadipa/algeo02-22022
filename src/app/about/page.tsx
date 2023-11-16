@@ -1,4 +1,4 @@
-import { AuthorProfiles } from "@/constant/about";
+import { AuthorProfiles } from "@/src/constant/about";
 import ProfileCard from "@/src/components/ProfileCard";
 import React from "react";
 

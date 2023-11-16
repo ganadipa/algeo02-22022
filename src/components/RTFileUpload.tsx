@@ -59,7 +59,6 @@ const FileUpload = ({
       const dataset = datasetInputRef.current?.files;
       const query = captured;
       const formData = new FormData();
-      console.log("hello world!");
 
       if (searchResult.loading) return;
 
@@ -76,7 +75,6 @@ const FileUpload = ({
       });
 
       const datasetArray = Array.from(dataset);
-      console.log("hello world");
       formData.append("query", captured);
       datasetArray.forEach((file, index) => {
         formData.append(`dataset[${index}]`, file);

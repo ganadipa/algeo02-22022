@@ -1,6 +1,6 @@
 "use client";
 
-import { sidebarLinks } from "../../../constant";
+import { sidebarLinks } from "../../constant";
 import React from "react";
 
 import { usePathname } from "next/navigation";
