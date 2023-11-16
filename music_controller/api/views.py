@@ -25,8 +25,8 @@ from django.core.files.base import ContentFile
 import io
 import base64
 from PIL import Image
-from api.save import save_base64_image
-
+# from api.save import save_base64_image
+from api.serializers import base64_to_image
 
 class RoomView(generics.CreateAPIView):
     queryset = Room.objects.all()
@@ -220,7 +220,7 @@ class ImageUploadView(APIView):
             query_image_path = os.path.join(
                 settings.MEDIA_ROOT, 'uploaded_images', "query.png")
             print(query_image)
-            save_base64_image(query_image, query_image_path)
+            base64_to_image(query_image, query_image_path)
             # img.save(query_image_path)
 
         dataset_folder_path = Path(settings.MEDIA_ROOT) / 'dataset_images'
@@ -239,14 +239,15 @@ class ImageUploadView(APIView):
                 print(f"Dataset image saved to: {dataset_image_path}")
 
         end = time.time()
-
+        print(query_image_path)
+        print(self.root+query_image_path)
         response = getSimiliarity(
             self.root+query_image_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
         response.__setitem__("upload_time", end-start)
 
-        similarities = self.image_similarity(
-            query_image_path, dataset_folder_path)
-        print(f"Similarities: {similarities}")
+        # similarities = self.image_similarity(
+        #     query_image_path, dataset_folder_path)
+        # print(f"Similarities: {similarities}")
 
         return JsonResponse(response, status=status.HTTP_201_CREATED)
         # except Exception as e:
