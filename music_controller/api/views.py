@@ -27,6 +27,12 @@ import base64
 from PIL import Image
 # from api.save import save_base64_image
 from api.serializers import base64_to_image
+from api.Web_Scraper.start_scrape import runScrape
+
+
+
+
+
 
 class RoomView(generics.CreateAPIView):
     queryset = Room.objects.all()
@@ -206,7 +212,8 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
-
+        isScraping = True
+   
         if query_image:
             query_image_path = os.path.join(
                 settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
@@ -223,6 +230,8 @@ class ImageUploadView(APIView):
             base64_to_image(query_image, query_image_path)
             # img.save(query_image_path)
 
+            
+
         dataset_folder_path = Path(settings.MEDIA_ROOT) / 'dataset_images'
         for existing_image_path in dataset_folder_path.iterdir():
             existing_image_path.unlink()
@@ -238,6 +247,11 @@ class ImageUploadView(APIView):
                         f.write(chunk)
                 print(f"Dataset image saved to: {dataset_image_path}")
 
+        if (isScraping):
+            scrapeString = "nyoman"
+            limit = 10
+            runScrape(scrapeString,limit)
+                        
         end = time.time()
         print(query_image_path)
         print(self.root+query_image_path)

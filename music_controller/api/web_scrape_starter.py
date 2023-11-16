@@ -1,6 +1,8 @@
-from Web_Scraper import start_scrape
+from api.Web_Scraper import start_scrape
 
 
 #
 # runScrape(query,limit)
-start_scrape.runScrape("jokowi",100)
+def runScrape(query,limit):
+    
+    start_scrape.runScrape(query,limit)
