@@ -101,6 +101,7 @@ const ShowLessThan4 = ({
 function RealTime() {
   const [captured, setCaptured] = useState<string | null>("");
   const webcamRef = useRef<Webcam | null>(null);
+  const [lock, setLock] = useState<boolean>(false);
 
   function captureImage() {
     if (!webcamRef.current) return;
@@ -110,8 +111,21 @@ function RealTime() {
   }
 
   useEffect(() => {
-    setTimeout(captureImage, 5000);
-  }, [captured]);
+    let timeoutId: NodeJS.Timeout;
+
+    if (!lock) {
+      timeoutId = setTimeout(() => {
+        captureImage();
+      }, 5000);
+    }
+
+    // Cleanup function to clear the timeout when lock is true
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [captured, lock]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -123,13 +137,21 @@ function RealTime() {
       </div>
       <div className="flex flex-col items-center justify-around md:flex-row">
         <Webcam ref={webcamRef} />
-        <Main captured={captured} />
+        <Main captured={captured} setLock={setLock} lock={lock} />
       </div>
     </div>
   );
 }
 
-const Main = ({ captured }: { captured: string | null }) => {
+const Main = ({
+  captured,
+  setLock,
+  lock,
+}: {
+  captured: string | null;
+  setLock: React.Dispatch<React.SetStateAction<boolean>>;
+  lock: boolean;
+}) => {
   const [numpage, setNumpage] = useState<number>(1);
   const [searchResult, setSearchResult] = useState<searchResultType>({
     data: [],
@@ -167,10 +189,12 @@ const Main = ({ captured }: { captured: string | null }) => {
           </div>
           <div>
             <FileUpload
+              setLock={setLock}
               setSearchResult={setSearchResult}
               searchResult={searchResult}
               setNumpage={setNumpage}
               captured={captured}
+              lock={lock}
             />
           </div>
         </section>

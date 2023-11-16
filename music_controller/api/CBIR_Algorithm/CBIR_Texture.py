@@ -4,8 +4,13 @@ from math import sqrt
 from math import log10
 from multiprocessing import Pool
 import time
+from api.CBIR_Algorithm.texture_caching import *
+from api.CBIR_Algorithm.caching import *
+from api.CBIR_Algorithm.CBIR_Color import *
 """ Actual Stuff """
 # Grayscale rgb conversion
+
+
 def GrayScaleValue(R: int, G: int, B: int) -> float:
     return int((0.299 * R + 0.587 * G + 0.114 * B))
 
@@ -30,12 +35,11 @@ def CalculateGLCMMatrix(img: Image) -> list[list[int]]:
     for y in range(1, height, compression_y):
         for x in range(1, width, compression_x):
 
+            R, G, B = pixels[x, y]
+            Y1 = GrayScaleValue(R, G, B)
 
-            R,G,B = pixels[x, y]
-            Y1 = GrayScaleValue(R,G,B)
-
-            R,G,B = pixels[x - 1, y - 1]
-            Y2 = GrayScaleValue(R,G,B)
+            R, G, B = pixels[x - 1, y - 1]
+            Y2 = GrayScaleValue(R, G, B)
 
             glcmMatrix[Y1][Y2] += 1
             glcmMatrixTranspose[Y2][Y1] += 1
@@ -51,7 +55,7 @@ def CalculateGLCMMatrix(img: Image) -> list[list[int]]:
 
 # Calculate contrast using info from GLCM
 # def calculateContrast(GLCM : list[list[int]]) -> float:
-    
+
 #     contrast = 0
 #     for i in range(256):
 #         for j in range(256):
@@ -62,7 +66,7 @@ def CalculateGLCMMatrix(img: Image) -> list[list[int]]:
 
 # # Calculate Homogeneity using info from GLCM
 # def calculateHomogeneity(GLCM : list[list[int]]) -> float:
-    
+
 #     homogeneity = 0
 #     for i in range(256):
 #         for j in range(256):
@@ -73,16 +77,20 @@ def CalculateGLCMMatrix(img: Image) -> list[list[int]]:
 
 # # Calculate contrast using info from GLCM
 # def calculateEntropy(GLCM : list[list[int]]) -> float:
-    
+
 #     entropy = 0
 #     for i in range(256):
 #         for j in range(256):
-            
+
 #             if GLCM[i][j] != 0:
 #                 entropy += (GLCM[i][j] * log10(GLCM[i][j]))
 
 #     return (-entropy)
-def calculateFeatures(GLCM : list[list[int]]) -> tuple:
+def writeAndCalculateFeatures(abspath_img: str, data) -> tuple:
+
+    img = Image.open(abspath_img)
+    GLCM = CalculateGLCMMatrix(img)
+
     contrast = 0
     homogeneity = 0
     entropy = 0
@@ -92,12 +100,15 @@ def calculateFeatures(GLCM : list[list[int]]) -> tuple:
             homogeneity += (GLCM[i][j] / (1 + ((i - j) * (i - j))))
             if GLCM[i][j] != 0:
                 entropy += (GLCM[i][j] * log10(GLCM[i][j]))
-    return contrast, homogeneity, -entropy
 
+    CHEVector = [contrast, homogeneity, entropy]
+
+    hashval = custom_hash(abspath_img)
+    append_hash_and_array_texture(data, hashval, CHEVector)
 
 
 # For the purposes of this program, the length is pre conditioned to be 3
-def cosineSimilarity(vector1 : list[float], vector2 : list[float]) -> float:
+def cosineSimilarity(vector1: list[float], vector2: list[float]) -> float:
 
     dot_product = 0
     vectorlength1 = 0
@@ -113,7 +124,7 @@ def cosineSimilarity(vector1 : list[float], vector2 : list[float]) -> float:
     return result
 
 
-def similarityTexture(img1 : Image, img2 : Image) -> float:
+def similarityTexture(img1: Image, img2: Image) -> float:
     # Build Gray-Level Co-occurence matrix
     GLCM1 = CalculateGLCMMatrix(img1)
     GLCM2 = CalculateGLCMMatrix(img2)
@@ -121,33 +132,37 @@ def similarityTexture(img1 : Image, img2 : Image) -> float:
     # Calculate contrast, homogeneity, and entropy of both images
     contrast1, homogeneity1, entropy1 = calculateFeatures(GLCM1)
     contrast2, homogeneity2, entropy2 = calculateFeatures(GLCM2)
-    
+
     # Store them as 2 vectors
     CHEvector1 = [contrast1, homogeneity1, entropy1]
     CHEvector2 = [contrast2, homogeneity2, entropy2]
 
     # Cosine similarity the vectors
     result = cosineSimilarity(CHEvector1, CHEvector2)
-    
+
     return result
 
-def similarityTextureV2(QueryCHEvector : list[float], Datasetimg : Image) -> float:
-    # Build Gray-Level Co-occurence matrix
-    GLCM = CalculateGLCMMatrix(Datasetimg)
 
-    # Calculate contrast, homogeneity, and entropy of both images
-    contrast, homogeneity, entropy = calculateFeatures(GLCM)
-    
-    # Store them as 2 vectors
-    CHEvector = [contrast, homogeneity, entropy]
+def similarityTextureV2(Query_img_path: str, Dataset_img_path: str, cache) -> float:
+
+    idx1 = get_index_by_abspath_image(cache, Query_img_path)
+    idx2 = get_index_by_abspath_image(cache, Dataset_img_path)
+
+    if (idx1 == -1):
+        writeAndCalculateFeatures(Query_img_path, cache)
+    if (idx2 == -1):
+        writeAndCalculateFeatures(Dataset_img_path, cache)
+
+    CHEVector_Q = get_all_array_texture_AP(cache, Query_img_path)
+    CHEVector_D = get_all_array_texture_AP(cache, Dataset_img_path)
 
     # Cosine similarity the vectors
-    result = cosineSimilarity(CHEvector, QueryCHEvector)
-    
+    result = cosineSimilarity(CHEVector_Q, CHEVector_D)
+
     return result
 # Texture Similarity (main function)
 # def similarityTexture(img1 : Image, img2 : Image) -> float:
-    
+
 #     # Build Gray-Level Co-occurence matrix
 #     GLCM1 = CalculateGLCMMatrix(img1)
 #     GLCM2 = CalculateGLCMMatrix(img2)
@@ -155,13 +170,13 @@ def similarityTextureV2(QueryCHEvector : list[float], Datasetimg : Image) -> flo
 #     # Calculate contrast, homogeneity, and entropy of both images
 #     # print time
 #     contrast1 = calculateContrast(GLCM1)
-    
+
 #     homogeneity1 = calculateHomogeneity(GLCM1)
 #     entropy1 = calculateEntropy(GLCM1)
 #     contrast2 = calculateContrast(GLCM2)
 #     homogeneity2 = calculateHomogeneity(GLCM2)
 #     entropy2 = calculateEntropy(GLCM2)
-    
+
 #     # Store them as 2 vectors
 #     CHEvector1 = [contrast1, homogeneity1, entropy1]
 #     CHEvector2 = [contrast2, homogeneity2, entropy2]

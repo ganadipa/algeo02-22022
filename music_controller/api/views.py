@@ -30,10 +30,6 @@ from api.serializers import base64_to_image
 from api.Web_Scraper.start_scrape import runScrape
 
 
-
-
-
-
 class RoomView(generics.CreateAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
@@ -212,8 +208,8 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
-        isScraping = True
-   
+        isScraping = False
+
         if query_image:
             query_image_path = os.path.join(
                 settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
@@ -229,8 +225,6 @@ class ImageUploadView(APIView):
             print(query_image)
             base64_to_image(query_image, query_image_path)
             # img.save(query_image_path)
-
-            
 
         dataset_folder_path = Path(settings.MEDIA_ROOT) / 'dataset_images'
         for existing_image_path in dataset_folder_path.iterdir():
@@ -250,8 +244,8 @@ class ImageUploadView(APIView):
         if (isScraping):
             scrapeString = "nyoman"
             limit = 10
-            runScrape(scrapeString,limit)
-                        
+            runScrape(scrapeString, limit)
+
         end = time.time()
         print(query_image_path)
         print(self.root+query_image_path)

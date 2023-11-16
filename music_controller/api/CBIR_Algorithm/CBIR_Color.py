@@ -362,9 +362,9 @@ def similarityColor(path_img1: str, path_img2: str, data) -> float:
     idx2 = get_index_by_abspath_image(data, path_img2)
     if (idx2 == -1):
         writeImageBlockVectors(data, path_img2)
-        idx2 = get_index_by_abspath_image(data, path_img2)
 
     idx1 = get_index_by_abspath_image(data, path_img1)
+    idx2 = get_index_by_abspath_image(data, path_img2)
 
     color_vectors1 = data[idx1]['attribute']
     color_vectors2 = data[idx2]['attribute']

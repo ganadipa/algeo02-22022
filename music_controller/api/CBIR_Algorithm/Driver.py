@@ -1,17 +1,17 @@
 from api.CBIR_Algorithm.CBIR_Color import *
 from api.CBIR_Algorithm.CBIR_Texture import *
 from api.CBIR_Algorithm.fileLoader import *
+from api.CBIR_Algorithm.caching import *
+from api.CBIR_Algorithm.texture_caching import *
 import time
 import os
-from api.CBIR_Algorithm.CustomThreading import CustomThread
-from queue import Queue
-from threading import Lock
-from threading import Thread
-from multiprocessing import Pool
 
 
 def getSimiliarity(query, isTexture, NUM_THREAD):
-    cache = get_cache()
+    if (isTexture):
+        cache = get_texture_cache()
+    else:
+        cache = get_cache()
 
     parent = os.path.abspath("./") + '\\public\\'
     dataset_files = loadFolder(parent + "\\dataset_images\\")
@@ -23,15 +23,9 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     result_dataset_files = list()
 
     if (isTexture):
-        queryImg = Image.open(query)
-        query_GLCM = CalculateGLCMMatrix(queryImg)
-        query_contrast, query_homogeneity, query_entropy = calculateFeatures(
-            query_GLCM)
-        query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
-
         for i, img in enumerate(dataset_images):
             val = similarityTextureV2(
-                query_CHEvector, img)
+                query, dataset_files[i], cache)
             if val >= 0.6:
                 similarity_values.append(val)
                 result_dataset_files.append(dataset_files[i])
@@ -164,7 +158,10 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
             path[len(path)-2] + '/' + path[len(path)-1]
 
     endTime = time.time()
-    update_database(cache)
+    if (isTexture):
+        update_texture_database(cache)
+    else:
+        update_database(cache)
     return {
         "duration": endTime-startTime,
         "similiarity_arr": similarity_values,

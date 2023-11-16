@@ -1,6 +1,7 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
 
 const CBIREndpoint = "http://localhost:8000/api/upload-image/";
 
@@ -29,6 +30,8 @@ type FileUploadType = {
   searchResult: searchResultType;
   setNumpage: React.Dispatch<React.SetStateAction<number>>;
   captured: string | null;
+  setLock: React.Dispatch<React.SetStateAction<boolean>>;
+  lock: boolean;
 };
 
 const FileUpload = ({
@@ -36,22 +39,32 @@ const FileUpload = ({
   setSearchResult,
   searchResult,
   setNumpage,
+  setLock,
+  lock,
 }: FileUploadType) => {
   const datasetInputRef = useRef<HTMLInputElement | null>(null);
   const [datasetUploaded, setDatasetUploaded] = useState<boolean>(false);
+  const [value, setValue] = useState("Color");
+
+  useEffect(() => {
+    if (datasetUploaded && lock) handleSubmit(value === "Color");
+    else if (datasetUploaded && !searchResult.loading) {
+      handleSubmit(value === "Color");
+    }
+  }, [captured, value, datasetUploaded, lock]);
 
   async function handleSubmit(isColor: boolean) {
     try {
       setNumpage(1);
-      const toastLoadingId = toast.loading("Searching...");
       const dataset = datasetInputRef.current?.files;
       const query = captured;
       const formData = new FormData();
       console.log("hello world!");
 
+      if (searchResult.loading) return;
+
       if (!query || !dataset) {
         toast.error("Something went wrong!");
-        toast.dismiss(toastLoadingId);
         return;
       }
       setSearchResult({
@@ -85,7 +98,6 @@ const FileUpload = ({
           upload_time: 0,
         });
         toast.error("Something went wrong!");
-        toast.dismiss(toastLoadingId);
         return;
       }
 
@@ -111,7 +123,6 @@ const FileUpload = ({
       setDatasetUploaded(true);
       setSearchResult(searchResultFromData);
       toast.success("Data result successfully arrived!");
-      toast.dismiss(toastLoadingId);
     } catch (error) {
       console.error("Error during fetch:", error);
     }
@@ -131,9 +142,17 @@ const FileUpload = ({
           directory=""
           ref={datasetInputRef}
           onChange={() => setDatasetUploaded(true)}
-          className="cursor-pointer rounded-md bg-[#57af95] px-4 py-2 text-white hover:bg-green-600"
+          className="cursor-pointer gap-4 rounded-md bg-[#57af95] px-4 py-2 text-white hover:bg-green-600"
         />
         {datasetUploaded && <p className="self-end">Dataset uploaded!</p>}
+        <button
+          className={`${
+            !lock ? "bg-white" : "bg-red-400"
+          } w-[200px] self-start rounded`}
+          onClick={() => setLock((lock) => !lock)}
+        >
+          {lock ? "Locked" : "Lock Photo & Stop Query"}
+        </button>
       </div>
       <div className="flex-between flex flex-row">
         {searchResult.loading ? (
@@ -142,18 +161,31 @@ const FileUpload = ({
           <>
             <p>Search by: </p>
             <div className="flex flex-row max-md:gap-4 md:gap-8">
-              <button
-                className="rounded bg-slate-600 py-2 text-white max-md:px-2 md:w-[100px]"
-                onClick={() => handleSubmit(false)}
+              <ToggleGroup.Root
+                className="ToggleGroup"
+                type="single"
+                defaultValue="Color"
+                value={value}
+                onValueChange={(value) => {
+                  if (value) setValue(value);
+                }}
+                aria-label="Text alignment"
               >
-                Texture
-              </button>
-              <button
-                className="rounded bg-slate-600 py-2 text-white max-md:px-2 md:w-[100px]"
-                onClick={() => handleSubmit(true)}
-              >
-                Color
-              </button>
+                <ToggleGroup.Item
+                  className="h-[40px] w-[60px] bg-white data-[state=on]:bg-green-500"
+                  value="Color"
+                  aria-label="Left aligned"
+                >
+                  Color
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  className="h-[40px] w-[60px] bg-white data-[state=on]:bg-green-500"
+                  value="Texture"
+                  aria-label="Right aligned"
+                >
+                  Texture
+                </ToggleGroup.Item>
+              </ToggleGroup.Root>
             </div>
           </>
         )}
