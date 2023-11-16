@@ -1,4 +1,4 @@
-import { ProfileType } from "@/src/types";
+import { ProfileType } from "../types";
 
 export const AuthorProfiles: ProfileType[] = [
   {
@@ -6,20 +6,18 @@ export const AuthorProfiles: ProfileType[] = [
     nim: "13522066",
     description:
       "I love to do competitive programming as well as software engineering.",
-    img: "/gana.png",
+    img: "/Gana.jpg",
   },
   {
-    name: "Nyoman Ganadipa Narayana",
-    nim: "13522066",
-    description:
-      "I love to do competitive programming as well as software engineering.",
-    img: "/gana.png",
+    name: "Rayhan Fadhlan Azka",
+    nim: "13522095",
+    description: "A guy",
+    img: "/rayhan.jpg",
   },
   {
-    name: "Nyoman Ganadipa Narayana",
-    nim: "13522066",
-    description:
-      "I love to do competitive programming as well as software engineering.",
-    img: "/gana.png",
+    name: "Rinaldy Arif Susanto",
+    nim: "13522022",
+    description: "My waifu is Misaka Mikoto.",
+    img: "/aldy.jpg",
   },
 ];

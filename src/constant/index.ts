@@ -32,4 +32,9 @@ export const sidebarLinks: SidebarLink[] = [
     route: "/realtime",
     label: "Real Time Experience",
   },
+  {
+    imgURL: "/assets/icons/web.svg",
+    route: "/scrape",
+    label: "Use Scraping",
+  },
 ];

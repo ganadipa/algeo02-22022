@@ -208,7 +208,7 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
-        isScraping = False
+        isScraping = request.POST.get('scrape') != ""
 
         if query_image:
             query_image_path = os.path.join(
@@ -242,7 +242,8 @@ class ImageUploadView(APIView):
                 # print(f"Dataset image saved to: {dataset_image_path}")
 
         if (isScraping):
-            scrapeString = "nyoman"
+            start = time.time()
+            scrapeString = request.POST.get("scrape")
             limit = 10
             runScrape(scrapeString, limit)
 

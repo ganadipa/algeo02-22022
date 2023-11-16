@@ -34,7 +34,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         for i, img in enumerate(dataset_images):
             val = similarityColor(
                 query, dataset_files[i], cache)
-            if val >= 0.6:
+            if val >= -1:
                 similarity_values.append(val)
                 result_dataset_files.append(dataset_files[i])
 
