@@ -13,12 +13,14 @@ export type searchResultType = {
   duration: number;
   ok: boolean;
   loading: boolean;
+  upload_time: number;
 };
 
 type BackendResponseType = {
   duration: number;
   similiarity_arr: number[];
   dataset: string[];
+  upload_time: number;
 };
 
 type FileUploadType = {
@@ -75,6 +77,7 @@ const FileUpload = ({
         duration: 0,
         ok: false,
         loading: true,
+        upload_time: 0,
       });
 
       const datasetArray = Array.from(dataset);
@@ -96,6 +99,7 @@ const FileUpload = ({
           duration: 0,
           ok: false,
           loading: false,
+          upload_time: 0,
         });
         toast.error("Something went wrong!");
         toast.dismiss(toastLoadingId);
@@ -110,9 +114,11 @@ const FileUpload = ({
         duration: 0,
         ok: true,
         loading: false,
+        upload_time: 0,
       };
 
       searchResultFromData.duration = data.duration;
+      searchResultFromData.upload_time = data.upload_time;
       for (let i = 0; i < data.similiarity_arr.length; i++) {
         searchResultFromData.data.push({
           similiarityRate: data.similiarity_arr[i],

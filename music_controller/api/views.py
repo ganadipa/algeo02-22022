@@ -20,6 +20,12 @@ import zipfile
 from api.CBIR_Algorithm.Driver import getSimiliarity
 import shutil
 from pathlib import Path
+import base64
+from django.core.files.base import ContentFile
+import io
+import base64
+from PIL import Image
+from api.save import save_base64_image
 
 
 class RoomView(generics.CreateAPIView):
@@ -184,6 +190,7 @@ class ImageUploadView(APIView):
     def post(self, request, format=None):
         NUM_THREAD = 10
 
+        start = time.time()
         # try:
 
         # return JsonResponse({'message': len(request.FILES)}, status=status.HTTP_201_CREATED)
@@ -199,6 +206,7 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
+
         if query_image:
             query_image_path = os.path.join(
                 settings.MEDIA_ROOT, 'uploaded_images', query_image.name)
@@ -206,8 +214,14 @@ class ImageUploadView(APIView):
                 for chunk in query_image.chunks():
                     f.write(chunk)
             print(f"Query image saved to: {query_image_path}")
-
-        # Save the dataset images to the local folder
+        else:
+            # using base64
+            query_image = request.POST.get('query')
+            query_image_path = os.path.join(
+                settings.MEDIA_ROOT, 'uploaded_images', "query.png")
+            print(query_image)
+            save_base64_image(query_image, query_image_path)
+            # img.save(query_image_path)
 
         dataset_folder_path = Path(settings.MEDIA_ROOT) / 'dataset_images'
         for existing_image_path in dataset_folder_path.iterdir():
@@ -224,15 +238,15 @@ class ImageUploadView(APIView):
                         f.write(chunk)
                 print(f"Dataset image saved to: {dataset_image_path}")
 
-        # start time
+        end = time.time()
 
         response = getSimiliarity(
             self.root+query_image_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
-        # end time and print
+        response.__setitem__("upload_time", end-start)
 
-        # similarities = self.image_similarity(query_image_path, dataset_folder_path)
-        # print(f"Similarities: {similarities}")
-        # end time and print
+        similarities = self.image_similarity(
+            query_image_path, dataset_folder_path)
+        print(f"Similarities: {similarities}")
 
         return JsonResponse(response, status=status.HTTP_201_CREATED)
         # except Exception as e:

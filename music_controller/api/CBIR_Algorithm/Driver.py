@@ -166,7 +166,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
     endTime = time.time()
     update_database(cache)
     return {
-        "duration": end-startTime,
+        "duration": endTime-startTime,
         "similiarity_arr": similarity_values,
         "dataset": dataset_files_relative_path
     }

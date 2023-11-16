@@ -112,6 +112,7 @@ const Main = ({ searchParams }: MainPageProps) => {
     duration: 0,
     ok: false,
     loading: false,
+    upload_time: 0,
   });
   const [showResultLoading, setShowResultLoading] = useState([
     true,
@@ -194,7 +195,8 @@ const Main = ({ searchParams }: MainPageProps) => {
               <h4 className="font-semibold text-green-400">Result</h4>
               <p>
                 {searchResult.data.length} Results in{" "}
-                {Math.floor(searchResult.duration)} seconds.
+                {searchResult.duration.toFixed(2)} seconds. With upload time:{" "}
+                {searchResult.upload_time.toFixed(2)} seconds
               </p>
             </div>
 
