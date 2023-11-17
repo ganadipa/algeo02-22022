@@ -7,7 +7,7 @@ import time
 import os
 
 
-def getSimiliarity(query, isTexture, NUM_THREAD):
+def getSimiliarity(query, isTexture, NUM_THREAD, isScraping):
     if (isTexture):
         cache = get_texture_cache()
     else:
@@ -26,7 +26,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         for i, img in enumerate(dataset_images):
             val = similarityTextureV2(
                 query, dataset_files[i], cache)
-            if val >= 0.6:
+            if val >= 0.6 - isScraping:
                 similarity_values.append(val)
                 result_dataset_files.append(dataset_files[i])
 
@@ -34,13 +34,12 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         for i, img in enumerate(dataset_images):
             val = similarityColor(
                 query, dataset_files[i], cache)
-            if val >= -1:
+            if val >= 0.6 - isScraping:
                 similarity_values.append(val)
                 result_dataset_files.append(dataset_files[i])
 
     # def inside_loopTexture(i: int, querySomething: list[float]):
     #     print(f"start: {i}")
-
     #     val = similarityTextureV2(
     #         querySomething, dataset_images[i])  # Mode tekstur
     #     if val >= 0.6:
@@ -162,6 +161,9 @@ def getSimiliarity(query, isTexture, NUM_THREAD):
         update_texture_database(cache)
     else:
         update_database(cache)
+
+    print(dataset_files_relative_path)
+
     return {
         "duration": endTime-startTime,
         "similiarity_arr": similarity_values,

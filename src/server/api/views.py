@@ -208,7 +208,10 @@ class ImageUploadView(APIView):
         isTexture = request.POST.get("search_method") == "texture"
 
         query_image = request.FILES.get('query')
-        isScraping = request.POST.get('scrape') != ""
+        print(request.POST.get('scrape'))
+        isScraping = request.POST.get(
+            'scrape') != "" and request.POST.get('scrape') != None
+        print(isScraping)
 
         if query_image:
             query_image_path = os.path.join(
@@ -222,7 +225,6 @@ class ImageUploadView(APIView):
             query_image = request.POST.get('query')
             query_image_path = os.path.join(
                 settings.MEDIA_ROOT, 'uploaded_images', "query.png")
-            print(query_image)
             base64_to_image(query_image, query_image_path)
             # img.save(query_image_path)
 
@@ -242,14 +244,16 @@ class ImageUploadView(APIView):
                 # print(f"Dataset image saved to: {dataset_image_path}")
 
         if (isScraping):
+
             start = time.time()
             scrapeString = request.POST.get("scrape")
-            limit = 10
+            limit = 100
             runScrape(scrapeString, limit)
+            print("done")
 
         end = time.time()
         response = getSimiliarity(
-            self.root+query_image_path, isTexture, NUM_THREAD)  # MODE TEKSTUR/WARNA
+            self.root+query_image_path, isTexture, NUM_THREAD, isScraping)  # MODE TEKSTUR/WARNA
         response.__setitem__("upload_time", end-start)
 
         # similarities = self.image_similarity(

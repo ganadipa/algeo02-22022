@@ -15,7 +15,7 @@ export const AuthorProfiles: ProfileType[] = [
     img: "/rayhan.jpg",
   },
   {
-    name: "Rinaldy Arif Susanto",
+    name: "Renaldy Arief Susanto",
     nim: "13522022",
     description: "My waifu is Misaka Mikoto.",
     img: "/aldy.jpg",
