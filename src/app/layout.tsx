@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Boxes",
+  title: "GACOR KANG",
   description:
     "The Q&A App is a user-friendly and interactive platform designed for knowledge sharing and collaborative learning. Users can ask questions, provide answers, and engage in discussions on a wide range of topics. The app facilitates the exchange of information and expertise, making it a valuable resource for both individuals seeking answers and those willing to share their knowledge. Whether you're a student looking for homework help, a professional seeking industry insights, or a curious mind exploring new subjects, the Q&A App connects you with a diverse community of users eager to assist and enlighten. Join the conversation, expand your knowledge, and contribute to the collective wisdom of the online community with the Q&A App.",
   icons: {
