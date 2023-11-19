@@ -10,23 +10,15 @@ Tugas Beasar ini adalah tentang mencari similiarity antar aimage satu dengan yan
 
 <h2 id="how-to-run">Cara Menjalankan Website</h2>
 
-### Go to src
 ```bash
 cd src
 ```
 Kemudian
 
-### Lakukan instalasi dan jalankan web
-
 ```bash
 npm install
 npm install -g npm-run-all
 npm run both
-```
-
-atau dapat disimplifikasi menjadi
-```bash
-sh web.sh
 ```
 
 ### Untuk cara menggunakan reverse image search ini, terdapat pada 
