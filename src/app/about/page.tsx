@@ -1,6 +1,6 @@
-import { AuthorProfiles } from "@/constant/about";
-import ProfileCard from "@/src/components/ProfileCard";
 import React from "react";
+import ProfileCard from "../../components/ProfileCard";
+import { AuthorProfiles } from "../../constant/about";
 
 const Page = () => {
   return (

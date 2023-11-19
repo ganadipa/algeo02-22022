@@ -42,7 +42,7 @@ export default function RootLayout({
           <LeftSidebar />
         </div>
         <div
-          className="p-4
+          className="flex items-center justify-center p-4
         "
         >
           {children}

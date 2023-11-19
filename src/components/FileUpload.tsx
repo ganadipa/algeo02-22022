@@ -107,7 +107,6 @@ const FileUpload = ({
       }
 
       const data: BackendResponseType = await response.json();
-      console.log(data);
 
       const searchResultFromData: searchResultType = {
         data: [],

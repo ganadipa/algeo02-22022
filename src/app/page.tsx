@@ -134,8 +134,6 @@ const Main = ({ searchParams }: MainPageProps) => {
     });
   }
 
-  useEffect(() => console.log(showResultLoading), [showResultLoading]);
-
   const idxMin = (numpage - 1) * 6;
   const idxMax = Math.min(searchResult.data.length, numpage * 6);
   const SHOWING_IMAGES = searchResult.data.slice(idxMin, idxMax);

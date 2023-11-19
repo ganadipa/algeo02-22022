@@ -1,6 +1,6 @@
-import { ProfileType } from "@/types";
 import Image from "next/image";
 import React from "react";
+import { ProfileType } from "../types";
 
 const ProfileCard = ({ name, description, img, nim }: ProfileType) => {
   return (
