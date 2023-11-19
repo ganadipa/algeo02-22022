@@ -38,109 +38,7 @@ def getSimiliarity(query, isTexture, NUM_THREAD, isScraping):
                 similarity_values.append(val)
                 result_dataset_files.append(dataset_files[i])
 
-    # def inside_loopTexture(i: int, querySomething: list[float]):
-    #     print(f"start: {i}")
-    #     val = similarityTextureV2(
-    #         querySomething, dataset_images[i])  # Mode tekstur
-    #     if val >= 0.6:
-    #         similarity_values.append(val)
-    #         result_dataset_files.append(dataset_files[i])  # ```revisi aldy
-    #     print(f"end: {i}")
 
-    # def inside_loopColor(i: int, querySomething: str):
-
-    #     val = similarityColor(
-    #         querySomething, dataset_files[i], cache)
-
-    #     if val >= 0.6:
-    #         similarity_values.append(val)
-    #         result_dataset_files.append(dataset_files[i])
-
-    # # for i in range(len(dataset_files)):
-    # #     inside_loop(i)
-    # i = [-1]
-    # length_dataset: int = len(dataset_files)
-
-    # threads = [0 for i in range(NUM_THREAD)]
-    # load = [0 for i in range(NUM_THREAD)]
-
-    # def thread_workload(label, querySomething):
-    #     if isTexture:
-    #         while i[0]+1 < length_dataset:
-    #             i[0] += 1
-    #             inside_loopTexture(i[0], querySomething)
-    #             load[label] += 1
-
-    #     else:
-    #         while i[0]+1 < length_dataset:
-    #             i[0] += 1
-    #             inside_loopColor(i[0], querySomething)
-    #             load[label] += 1
-
-    # # make queryImg as a file in uploaded_images folder
-    # queryImg = Image.open(query)
-    # query_GLCM = CalculateGLCMMatrix(queryImg)
-    # query_contrast, query_homogeneity, query_entropy = calculateFeatures(
-    #     query_GLCM)
-    # query_CHEvector = [query_contrast, query_homogeneity, query_entropy]
-
-    # for k in range(NUM_THREAD):
-    #     if (isTexture):
-    #         t = CustomThread(target=thread_workload,
-    #                          args=(k, query_CHEvector))
-    #     else:
-    #         t = CustomThread(target=thread_workload,
-    #                          args=(k, query))
-    #     t.start()
-    #     threads[k] = t
-
-    # for k in range(NUM_THREAD):
-    #     threads[k].join()
-    # for k in range(NUM_THREAD):
-    #     if(isTexture):
-    #         t = Thread(target=thread_workload, args=(k, query_CHEvector))
-    #     else:
-    #         t = Thread(target=thread_workload, args=(k, queryImg))
-    #     t.start()
-    #     threads.append(t)
-
-    # for k in range(NUM_THREAD):
-    #     threads[k].join()
-
-    # for k in range(NUM_THREAD):
-    #     threads[k].join()
-
-    # for i in range(0, length_dataset, 5):
-    #     t1 = CustomThread(target=inside_loop, args=(i,))
-    #     t1.start()
-
-    #     if (i+1 < length_dataset):
-    #         t2 = CustomThread(target=inside_loop, args=(i+1,))
-    #         t2.start()
-
-    #     if (i+2 < length_dataset):
-    #         t3 = CustomThread(target=inside_loop, args=(i+2,))
-    #         t3.start()
-
-    #     if (i+3 < length_dataset):
-    #         t4 = CustomThread(target=inside_loop, args=(i+3,))
-    #         t4.start()
-
-    #     if (i+4 < length_dataset):
-    #         t5 = CustomThread(target=inside_loop, args=(i+4,))
-    #         t5.start()
-
-    #     t1.join()
-    #     if (i+1 < length_dataset):
-    #         t2.join()
-    #     if (i+2 < length_dataset):
-    #         t3.join()
-    #     if (i+3 < length_dataset):
-    #         t4.join()
-    #     if (i+4 < length_dataset):
-    #         t5.join()
-
-    # dataset_files = dataset_files[:len(similarity_values)] # gak gini gan -Aldy
 
     # SORTING
 
@@ -199,10 +97,7 @@ if __name__ == "__main__":
                     similarity_values[i], similarity_values[j] = similarity_values[j], similarity_values[i]
                     filenames[i], filenames[j] = filenames[j], filenames[i]
 
-        # for i in range(len(filenames)):
-        #     if i != 0:
-        #         print(f"{i}:", filenames[i], "{:.2f}".format(
-        #             similarity_values[i] * 100))
+
 
         end = time.time()
         print(f"Time elapsed: ", end="")

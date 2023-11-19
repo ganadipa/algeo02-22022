@@ -4,7 +4,7 @@ from pathlib import Path
 
 try:
     from bing import Bing
-except ImportError:  # Python 3
+except ImportError: 
     from .bing import Bing
 
 

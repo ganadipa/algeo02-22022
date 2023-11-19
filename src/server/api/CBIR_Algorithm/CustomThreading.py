@@ -15,11 +15,3 @@ class CustomThread(Thread):
         return self._return
 
 
-# def add(n1, n2):
-#     result = n1 + n2
-#     return result
-
-
-# t = CustomThread(target=add, args=(1, 2))
-# t.start()
-# print(t.join())
