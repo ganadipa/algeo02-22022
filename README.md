@@ -6,7 +6,7 @@
 - <a href="#how-to-run">Cara Menjalankan Website</a>
 
 <h2 id="description">Deskripsi</h2>
-Tugas Besar ini adalah tentang mencari similarity antara image satu dengan yang lainnya menggunakan suatu algoritma. Algoritma ini dinamakan CBIR, yang mana detail terkait program ini bisa dilihat di <a href="doc/Algeo02-13522022.pdf">file laporan</a>.
+Tugas Besar ini adalah tentang mencari similarity antara image satu dengan yang lainnya menggunakan suatu algoritma. Algoritma ini dinamakan CBIR, yang mana detail terkait program ini bisa dilihat di <a href="doc/Algeo02-22022.pdf">file laporan</a>.
 
 <h2 id="how-to-run">Cara Menjalankan Website</h2>
 
