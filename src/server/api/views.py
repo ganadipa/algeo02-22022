@@ -104,7 +104,7 @@ class ImageUploadView(APIView):
 
             start = time.time()
             scrapeString = request.POST.get("scrape")
-            limit = 3
+            limit = 10
             runScrape(scrapeString, limit)
             print("done")
 
