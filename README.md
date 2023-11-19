@@ -6,7 +6,7 @@
 - <a href="#how-to-run">Cara Menjalankan Website</a>
 
 <h2 id="description">Deskripsi</h2>
-Tugas besar ini berisi program dalam bahasa Java yang berisi fungsi-fungsi eliminasi Gauss, eliminasi Gauss-Jordan, menentukan balikan matriks, menghitung determinan, kaidah Cramer (kaidah Cramer khusus untuk SPL dengan n peubah dan n persamaan), interpolasi polinomial, interpolasi bicubic, dan regresi linier berganda. Detail terkait program ini bisa dilihat di <a href="doc/Algeo02-13522022.pdf">file laporan</a>.
+Tugas Beasar ini adalah tentang mencari similiarity antar aimage satu dengan yang lainnya menggunakan suatu algoritma. Algoritma ini dinamakan CBIR, yang mana detail terkait program ini bisa dilihat di <a href="doc/Algeo02-13522022.pdf">file laporan</a>.
 
 <h2 id="how-to-run">Cara Menjalankan Website</h2>
 
