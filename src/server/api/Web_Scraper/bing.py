@@ -44,7 +44,7 @@ class Bing:
             filename = posixpath.basename(path).split('?')[0]
             file_type = filename.split(".")[-1]
             if file_type.lower() not in ["jpeg", "png", "jpg"]:
-                file_type = "jpg"
+                return
 
             print("[%] Downloading Image #{} from {}".format(
                 self.download_count, link))
